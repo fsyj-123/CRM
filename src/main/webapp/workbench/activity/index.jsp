@@ -7,6 +7,7 @@
     <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
     <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css"
           rel="stylesheet"/>
+    <link href="jquery/bs_pagination/jquery.bs_pagination.min.css" type="text/css" rel="stylesheet">
 
     <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
     <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
@@ -14,9 +15,102 @@
             src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript"
             src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script type="text/javascript"
+            src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+    <script type="text/javascript"
+            src="jquery/bs_pagination/en.js"></script>
 
     <script type="text/javascript">
+        <%!Integer pageSize = 2;%>  // 设置页面页码
+
+        /*
+        需要调用分页的情况：
+            1、点击市场活动
+            2、点击分页条
+            3、点击查询按钮
+            4、点击创建、修改、删除
+            5、重置按钮
+         */
+        function pageList(pageNo, pageSize) {
+            // 隐藏条件表单项
+            let hide_name = $("#hide-name");
+            let hide_owner = $("#hide-owner");
+            let hide_startTime = $("#hide-startTime");
+            let hide_endTime = $("#hide-endTime");
+            // 条件表单项
+            let search_name = $("#search-name");
+            let search_owner = $("#search-owner");
+            let search_startTime = $("#search-startTime");
+            let search_endTime = $("#search-endTime");
+            search_name.val(hide_name.val())
+            search_owner.val(hide_owner.val())
+            search_startTime.val(hide_startTime.val())
+            search_endTime.val(hide_endTime.val())
+
+            $.ajax({
+                url: "workbench/activity.do",
+                data: {
+                    action: "getPageList",
+                    name: $.trim(hide_name.val()),
+                    owner: $.trim(hide_owner.val()),
+                    startTime: hide_startTime.val(),
+                    endTime: hide_endTime.val(),
+                    pageNo: pageNo,
+                    pageSize: pageSize
+                },
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    let html = "";
+                    $.each(data.pageList, function (i, item) {
+                        html += "<tr class=\"active\">";
+                        html += "<td><input name='checkItem' type=\"checkbox\" value=" + item.id + "/></td>";
+                        html += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.jsp';\">" + item.name + "</a>";
+                        html += "</td>";
+                        html += "<td>" + item.owner + "</td>";
+                        html += "<td>" + item.startDate + "</td>";
+                        html += "<td>" + item.endDate + "</td>";
+                        html += "</tr>";
+                    })
+                    $("#list").html(html);
+                    // 展示分页插件
+                    let totalPages = data.total / pageSize;
+                    totalPages = data.total % pageSize === 0 ? totalPages : parseInt(totalPages) + 1;
+                    $("#activityPage").bs_pagination({
+                        currentPage: pageNo, // 页码
+                        rowsPerPage: pageSize, // 每页显示的记录条数
+                        maxRowsPerPage: 20, // 每页最多显示的记录条数
+                        totalPages: totalPages, // 总页数
+                        totalRows: data.total, // 总记录条数
+
+                        visiblePageLinks: 4, // 显示几个卡片
+
+                        showGoToPage: true,
+                        showRowsPerPage: true,
+                        showRowsInfo: true,
+                        showRowsDefaultInfo: true,
+
+                        onChangePage : function(event, data){
+                            pageList(data.currentPage , data.rowsPerPage);
+                        }
+                    });
+                }
+            })
+        }
+
         $(function () {
+
+            // 隐藏条件表单项
+            let hide_name = $("#hide-name");
+            let hide_owner = $("#hide-owner");
+            let hide_startTime = $("#hide-startTime");
+            let hide_endTime = $("#hide-endTime");
+            // 条件表单项
+            let search_name = $("#search-name");
+            let search_owner = $("#search-owner");
+            let search_startTime = $("#search-startTime");
+            let search_endTime = $("#search-endTime");
+
             let selection = $("#create-marketActivityOwner");
             $("#addBtn").click(function () {
 
@@ -46,6 +140,7 @@
                         }
                     }
                 });
+
             });
             $("#saveBtn").click(function () {
                 $("#createActivityModal").modal("hide");
@@ -75,12 +170,66 @@
             });
             $(".time").datetimepicker({
                 minView: "month",
-                language:  'zh-CN',
+                language: 'zh-CN',
                 format: 'yyyy-mm-dd',
                 autoclose: true,
                 todayBtn: true,
                 pickerPosition: "bottom-left"
             });
+            // 为查询按钮绑定分页
+            $("#search-condition").click(function () {
+                /*
+                这里直接发起请求出现了一个问题：在条件框中输入条件，但不点击查询按钮，转而触发其他分页方法
+                出现了直接将输入的参数携带入条件中
+                解决办法：
+                新增一个隐藏域，用于保存上次传入的查询参数，每次调用分页方法时
+                转而获取隐藏域中保存的数据
+                 */
+
+
+                hide_name.val(search_name.val());
+                hide_owner.val(search_owner.val());
+                hide_startTime.val(search_startTime.val());
+                hide_endTime.val(search_endTime.val());
+
+                pageList(1,<%=pageSize%>);
+            })
+            // 点击创建、修改、删除
+            $("button[name=updatePage]").click(function () {
+                pageList(1, <%=pageSize%>)
+            })
+
+            // 重置条件表单中的所有表单项（包括隐藏域），并刷新分页
+            $("#reset").click(function () {
+                hide_name.val("");
+                hide_owner.val("");
+                hide_startTime.val("");
+                hide_endTime.val("");
+                search_name.val("")
+                search_owner.val("")
+                search_startTime.val("")
+                search_endTime.val("")
+
+                pageList(1,<%=pageSize%>)
+            })
+            
+            // 为选择框绑定事件
+            $("#checkBox").click(function () {
+                $("input[name=checkItem]").prop("checked",this.checked);
+            })
+            /*
+            这种绑定方式无效，对于动态生成的元素，普通的绑定方法无效，需要根据动态元素的外层有效元素进行绑定
+            语法：
+            $(外层有效选择器).on(绑定的事件,需要绑定的jquery对象,回调函数)
+            $("input[name=checkItem]").click(function () {
+                $("#checkBox").prop("checked",)
+            })*/
+            $("#list").on("click",$("input[name=checkItem]"),function () {
+                $("#checkBox").prop("checked",
+                    $("input[name=checkItem]").length==$("input[name=checkItem]:checked").length)
+            })
+            // 在页面加载完成后调用pageList方法，默认第一页，两条数据
+            pageList(1, <%=pageSize%>)
         });
     </script>
 </head>
@@ -169,9 +318,7 @@
                                 style="font-size: 15px; color: red;">*</span></label>
                         <div class="col-sm-10" style="width: 300px;">
                             <select class="form-control" id="edit-marketActivityOwner">
-                                <option>zhangsan</option>
-                                <option>lisi</option>
-                                <option>wangwu</option>
+
                             </select>
                         </div>
                         <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span
@@ -231,48 +378,52 @@
         <div class="btn-toolbar" role="toolbar" style="height: 80px;">
             <form class="form-inline" role="form" style="position: relative;top: 8%; left: 5px;">
 
+
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">名称</div>
-                        <input class="form-control" type="text">
+                        <input type="hidden" id="hide-name">
+                        <input class="form-control" id="search-name" type="text">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">所有者</div>
-                        <input class="form-control" type="text">
+                        <input type="hidden" id="hide-owner">
+                        <input class="form-control" id="search-owner" type="text">
                     </div>
                 </div>
-
 
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">开始日期</div>
-                        <input class="form-control" type="text" id="startTime"/>
+                        <input type="hidden" id="hide-startTime">
+                        <input class="form-control time" type="text" id="search-startTime"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="input-group">
                         <div class="input-group-addon">结束日期</div>
-                        <input class="form-control" type="text" id="endTime">
+                        <input type="hidden" id="hide-endTime">
+                        <input class="form-control time" type="text" id="search-endTime">
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-default">查询</button>
+                <button type="button" id="reset" class="btn btn-default">重置</button>
+                <button type="button" id="search-condition" class="btn btn-default">查询</button>
 
             </form>
         </div>
         <div class="btn-toolbar" role="toolbar"
              style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
             <div class="btn-group" style="position: relative; top: 18%;">
-                <button type="button" id="addBtn" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>
+                <button type="button" id="addBtn" name="updatePage" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span>
                     创建
                 </button>
-                <button type="button" id="updateBtn" class="btn btn-default" data-toggle="modal"
+                <button type="button" id="updateBtn" name="updatePage" class="btn btn-default" data-toggle="modal"
                         data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改
                 </button>
-                <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+                <button type="button" name="updatePage" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
             </div>
 
         </div>
@@ -280,66 +431,21 @@
             <table class="table table-hover">
                 <thead>
                 <tr style="color: #B3B3B3;">
-                    <td><input type="checkbox"/></td>
+                    <td><input id="checkBox" type="checkbox"/></td>
                     <td>名称</td>
                     <td>所有者</td>
                     <td>开始日期</td>
                     <td>结束日期</td>
                 </tr>
                 </thead>
-                <tbody>
-                <tr class="active">
-                    <td><input type="checkbox"/></td>
-                    <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a>
-                    </td>
-                    <td>zhangsan</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                </tr>
-                <tr class="active">
-                    <td><input type="checkbox"/></td>
-                    <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a>
-                    </td>
-                    <td>zhangsan</td>
-                    <td>2020-10-10</td>
-                    <td>2020-10-20</td>
-                </tr>
+                <tbody id="list">
                 </tbody>
             </table>
         </div>
 
         <div style="height: 50px; position: relative;top: 30px;">
-            <div>
-                <button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-            </div>
-            <div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-                <button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        10
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">20</a></li>
-                        <li><a href="#">30</a></li>
-                    </ul>
-                </div>
-                <button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-            </div>
-            <div style="position: relative;top: -88px; left: 285px;">
-                <nav>
-                    <ul class="pagination">
-                        <li class="disabled"><a href="#">首页</a></li>
-                        <li class="disabled"><a href="#">上一页</a></li>
-                        <li class="active"><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">下一页</a></li>
-                        <li class="disabled"><a href="#">末页</a></li>
-                    </ul>
-                </nav>
+            <div id="activityPage">
+
             </div>
         </div>
 

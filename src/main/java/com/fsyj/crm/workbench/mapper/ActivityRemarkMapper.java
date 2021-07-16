@@ -1,4 +1,4 @@
-package com.fsyj.crm.workbench.dao;
+package com.fsyj.crm.workbench.mapper;
 
 public interface ActivityRemarkMapper {
 }
