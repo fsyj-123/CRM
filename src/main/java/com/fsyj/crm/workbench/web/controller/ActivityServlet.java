@@ -23,8 +23,8 @@ public class ActivityServlet extends BaseServlet {
     public void getUserList(HttpServletRequest request, HttpServletResponse response) {
         try {
             List<User> userList = userService.getUserList();
-            // 这里直接返回两个值在前端解析data会出现错误
-            /*PrintJson.printJsonFlag(response, true);
+            /*这里直接返回两个值在前端解析data会出现错误
+            PrintJson.printJsonFlag(response, true);
             PrintJson.printJsonObj(response, userList);*/
             HashMap<String, Object> map = new HashMap<>(2);
             map.put("success", true);
@@ -72,11 +72,38 @@ public class ActivityServlet extends BaseServlet {
             paramMap.put("pageSize", pageSize);
             paramMap.put("pageNo", pageNo);
             paramMap.put("beginIndex", beginIndex);
-            for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
-                System.out.println(entry);
-            }
             PageNavigate<Activity> pageList = activityService.getPageList(paramMap);
             PrintJson.printJsonObj(response, pageList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void deleteActivity(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String[] ids = request.getParameterValues("id[]");
+            if (ids == null || ids.length == 0) {
+                PrintJson.printJsonFlag(response, false);
+                return;
+            }
+            activityService.deleteActivity(ids);
+            PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void getUserListAndAct(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            List<User> userList = userService.getUserList();
+            Activity activity = activityService.getActivity(request.getParameter("id"));
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("success", true);
+            map.put("userList", userList);
+            map.put("activity", activity);
+            PrintJson.printJsonObj(response, map);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);

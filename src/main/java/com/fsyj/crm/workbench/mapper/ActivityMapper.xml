@@ -18,6 +18,7 @@
                 #{editTime},
                 #{editBy})
     </insert>
+
     <select id="queryCountByCondition" parameterType="java.util.Map" resultType="int">
         select count(*) from tbl_activity
         <where>
@@ -35,6 +36,7 @@
             </if>
         </where>
     </select>
+
     <select id="queryListByCondition" parameterType="java.util.Map" resultType="com.fsyj.crm.workbench.bean.Activity">
         select ta.createTime, ta.id, ta.name,tu.name as owner, ta.startDate, ta.endDate
         from tbl_activity ta inner join tbl_user tu on ta.owner = tu.id
@@ -53,5 +55,16 @@
             </if>
         </where>
         order by ta.createTime desc limit #{beginIndex}, #{pageSize};
+    </select>
+
+    <delete id="deleteByIds" parameterType="string">
+        delete from tbl_activity where id in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryById" resultType="com.fsyj.crm.workbench.bean.Activity">
+        select * from tbl_activity where id = #{id};
     </select>
 </mapper>

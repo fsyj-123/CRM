@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -57,6 +58,16 @@ public class PrintJson {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String toJson(Object obj) {
+        String s = null;
+        try {
+             s = om.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return s;
     }
 }
 

@@ -9,4 +9,8 @@ public interface ActivityService {
     void saveActivity(Activity activity) throws Exception;
 
     PageNavigate<Activity> getPageList(Map<String, Object> parameterMap);
+
+    void deleteActivity(String[] ids) throws Exception;
+
+    Activity getActivity(String id);
 }
