@@ -26,6 +26,7 @@
 
         // 用于标识获取用户列表是否成功
         let getUserFlag;
+
         /*
         需要调用分页的情况：
             1、点击市场活动
@@ -86,9 +87,7 @@
                         maxRowsPerPage: 20, // 每页最多显示的记录条数
                         totalPages: totalPages, // 总页数
                         totalRows: data.total, // 总记录条数
-
                         visiblePageLinks: 4, // 显示几个卡片
-
                         showGoToPage: true,
                         showRowsPerPage: true,
                         showRowsInfo: true,
@@ -298,7 +297,8 @@
                                 $edit_owner.html(userListHtml);
                                 // 展现模态窗口
                                 $("#edit-id").val(activity.id);
-                                $("#edit-owner").val(activity.owner);
+                                $edit_owner.val(activity.owner);
+                                $("#edit-name").val(activity.name);
                                 $("#edit-startTime").val(activity.startDate);
                                 $("#edit-endTime").val(activity.endDate);
                                 $("#edit-cost").val(activity.cost);
@@ -312,6 +312,39 @@
                     });
                 }
             })
+
+            // 更新操作
+            $("#edit-update").click(function () {
+                // 关闭模态窗口
+                $("#editActivityModal").modal("hide");
+                // 向后台发起ajax请求，更新市场活动信息
+                $.ajax({
+                    url: "workbench/activity.do",
+                    data: {
+                        action: "updateActivity",
+
+                        id: $("#edit-id").val(),
+                        owner: $("#edit-owner").val(),
+                        name: $("#edit-name").val(),
+                        startDate: $("#edit-startTime").val(),
+                        endDate: $("#edit-endTime").val(),
+                        cost: $("#edit-cost").val(),
+                        description: $("#edit-describe").val()
+                    },
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.success) {
+                            pageList(1, <%=pageSize%>)
+                        } else {
+                            alert("更新失败，请重试");
+                        }
+                        // 当打开模态窗口时重置窗口-默认只在保存按钮关闭
+                        $("#addActivityForm")[0].reset();
+                    }
+                })
+                pageList(1, <%=pageSize%>)
+            });
 
             // 在页面加载完成后调用pageList方法，默认第一页，两条数据
             pageList(1, <%=pageSize%>)
@@ -406,10 +439,10 @@
 
                             </select>
                         </div>
-                        <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span id="edit-name"
+                        <label for="edit-name" class="col-sm-2 control-label">名称<span
                                 style="font-size: 15px; color: red;"></span></label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="edit-marketActivityName" value="发传单">
+                            <input type="text" class="form-control" id="edit-name" value="">
                         </div>
                     </div>
 
@@ -420,7 +453,7 @@
                         </div>
                         <label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
                         <div class="col-sm-10" style="width: 300px;">
-                            <input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+                            <input type="text" class="form-control time" id="edit-endTime" value="2020-10-20">
                         </div>
                     </div>
 
@@ -443,7 +476,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+                <button type="button" id="edit-update" class="btn btn-primary">更新</button>
             </div>
         </div>
     </div>

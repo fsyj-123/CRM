@@ -50,4 +50,10 @@ public class ActivityServiceImpl implements ActivityService {
         assert id != null && !"".equals(id);
         return mapper.queryById(id);
     }
+
+    @Override
+    public void updateActivity(Activity activity) {
+        ActivityMapper mapper = SqlSessionUtil.getSqlSession().getMapper(ActivityMapper.class);
+        mapper.updateById(activity.getId(), activity);
+    }
 }

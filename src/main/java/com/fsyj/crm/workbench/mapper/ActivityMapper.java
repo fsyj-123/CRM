@@ -16,4 +16,6 @@ public interface ActivityMapper {
     void deleteByIds(@Param("ids") String[] ids);
 
     Activity queryById(@Param("id") String id);
+
+    void updateById(@Param("id") String id, @Param("activity") Activity activity);
 }

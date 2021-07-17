@@ -67,4 +67,16 @@
     <select id="queryById" resultType="com.fsyj.crm.workbench.bean.Activity">
         select * from tbl_activity where id = #{id};
     </select>
+
+    <update id="updateById">
+        update tbl_activity set
+            owner = #{activity.owner},
+            name = #{activity.name},
+            startDate = #{activity.startDate},
+            endDate = #{activity.endDate},
+            cost = #{activity.cost},
+            description = #{activity.description},
+            editTime = #{activity.editTime},
+            editBy = #{activity.editBy} where id = #{id}
+    </update>
 </mapper>

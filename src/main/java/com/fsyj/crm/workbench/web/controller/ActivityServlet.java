@@ -109,4 +109,22 @@ public class ActivityServlet extends BaseServlet {
             PrintJson.printJsonFlag(response, false);
         }
     }
+
+    public void updateActivity(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            Activity activity = BeanUtil.getObjectFromMap(parameterMap, Activity.class);
+            if (activity == null) {
+                return;
+            }
+            activity.setEditTime(DateTimeUtil.getSysTime());
+            User operator = (User) request.getSession().getAttribute("user");
+            activity.setEditBy(operator.getId());
+            activityService.updateActivity(activity);
+            PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
 }

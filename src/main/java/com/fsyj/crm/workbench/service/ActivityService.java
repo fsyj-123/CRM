@@ -13,4 +13,6 @@ public interface ActivityService {
     void deleteActivity(String[] ids) throws Exception;
 
     Activity getActivity(String id);
+
+    void updateActivity(Activity activity);
 }
