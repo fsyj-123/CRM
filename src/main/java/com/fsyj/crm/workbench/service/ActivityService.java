@@ -15,4 +15,6 @@ public interface ActivityService {
     Activity getActivity(String id);
 
     void updateActivity(Activity activity);
+
+    Activity getDetailByID(String id);
 }

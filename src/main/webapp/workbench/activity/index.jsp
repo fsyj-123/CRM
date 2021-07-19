@@ -70,7 +70,7 @@
                     $.each(data.pageList, function (i, item) {
                         html += "<tr class=\"active\">";
                         html += "<td><input name='checkItem' type=\"checkbox\" value=" + item.id + "></td>";
-                        html += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='detail.jsp';\">" + item.name + "</a>";
+                        html += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href=\'workbench/activity.do?action=detail&id=" + item.id + "\';\">" + item.name + "</a>";
                         html += "</td>";
                         html += "<td>" + item.owner + "</td>";
                         html += "<td>" + item.startDate + "</td>";
@@ -248,7 +248,7 @@
                     $.ajax({
                         url: "workbench/activity.do",
                         data: {
-                            action: "deleteActivity",
+                            action: "deleteActivities",
                             id: ids
                         },
                         dataType: "json",

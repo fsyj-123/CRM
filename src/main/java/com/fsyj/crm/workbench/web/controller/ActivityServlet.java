@@ -7,8 +7,11 @@ import com.fsyj.crm.utils.*;
 import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.web.controller.BaseServlet;
 import com.fsyj.crm.workbench.bean.Activity;
+import com.fsyj.crm.workbench.bean.ActivityRemark;
+import com.fsyj.crm.workbench.service.ActivityRemarkService;
 import com.fsyj.crm.workbench.service.ActivityService;
-import com.fsyj.crm.workbench.service.serviceImpl.ActivityServiceImpl;
+import com.fsyj.crm.workbench.service.impl.ActivityRemarkServiceImpl;
+import com.fsyj.crm.workbench.service.impl.ActivityServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -80,7 +83,7 @@ public class ActivityServlet extends BaseServlet {
         }
     }
 
-    public void deleteActivity(HttpServletRequest request, HttpServletResponse response) {
+    public void deleteActivities(HttpServletRequest request, HttpServletResponse response) {
         try {
             String[] ids = request.getParameterValues("id[]");
             if (ids == null || ids.length == 0) {
@@ -122,6 +125,36 @@ public class ActivityServlet extends BaseServlet {
             activity.setEditBy(operator.getId());
             activityService.updateActivity(activity);
             PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void detail(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String id = request.getParameter("id");
+            System.out.println(id);
+            Activity activity = activityService.getDetailByID(id);
+            request.setAttribute("activity", activity);
+            System.out.println(activity);
+            request.getRequestDispatcher("/workbench/activity/detail.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void activityRemarkList(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String id = request.getParameter("id");
+            ActivityRemarkService ars = (ActivityRemarkService) ServiceFactory.getService(new ActivityRemarkServiceImpl());
+            List<ActivityRemark> remarkList = ars.getRemarkList(id);
+            System.out.println(remarkList);
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("remarkList", remarkList);
+            map.put("success", true);
+            PrintJson.printJsonObj(response, map);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);

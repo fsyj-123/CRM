@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author fsyj
+ */
 public interface ActivityMapper {
     public int saveActivity(Activity activity);
 
@@ -18,4 +21,6 @@ public interface ActivityMapper {
     Activity queryById(@Param("id") String id);
 
     void updateById(@Param("id") String id, @Param("activity") Activity activity);
+
+    Activity queryActivityById(@Param("id") String id);
 }

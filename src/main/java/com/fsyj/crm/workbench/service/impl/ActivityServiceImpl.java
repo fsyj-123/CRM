@@ -1,4 +1,4 @@
-package com.fsyj.crm.workbench.service.serviceImpl;
+package com.fsyj.crm.workbench.service.impl;
 
 import com.fsyj.crm.utils.SqlSessionUtil;
 import com.fsyj.crm.vo.PageNavigate;
@@ -55,5 +55,12 @@ public class ActivityServiceImpl implements ActivityService {
     public void updateActivity(Activity activity) {
         ActivityMapper mapper = SqlSessionUtil.getSqlSession().getMapper(ActivityMapper.class);
         mapper.updateById(activity.getId(), activity);
+    }
+
+    @Override
+    public Activity getDetailByID(String id) {
+        ActivityMapper mapper = SqlSessionUtil.getSqlSession().getMapper(ActivityMapper.class);
+        assert id != null && !"".equals(id);
+        return mapper.queryActivityById(id);
     }
 }
