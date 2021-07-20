@@ -13,4 +13,6 @@ public interface ActivityRemarkService {
     void deleteRemark(String id);
 
     void updateRemark(String id, String content, String editor);
+
+    void createRemark(ActivityRemark activityRemark) throws Exception;
 }

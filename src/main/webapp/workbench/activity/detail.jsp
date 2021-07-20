@@ -108,6 +108,8 @@
                 $("#cancelAndSaveBtn").hide();
                 //设置remarkDiv的高度为130px
                 $("#remarkDiv").css("height", "90px");
+                // 清空输入框
+                $("#remark").val("");
                 cancelAndSaveBtnDefault = true;
             });
 
@@ -237,6 +239,30 @@
                     $("#editRemarkModal").modal("hide");
                 } else {
                     alert("内容不能为空")
+                }
+            })
+
+            $("#saveBtn").click(function () {
+                let remark = $.trim($("#remark").val());
+                if (remark !== "") {
+                    $.ajax({
+                        url:"workbench/activity.do",
+                        data:{
+                            action:"saveRemark",
+                            content:remark,
+                            activityId:$activityId.val()
+                        },
+                        dataType:"json",
+                        type:"post",
+                        success:function (data) {
+                            if(data.success) {
+                                $("#remark").val("")
+                                showActivityRemark()
+                            } else {
+                                alert("保存失败，请重试")
+                            }
+                        }
+                    })
                 }
             })
 
@@ -442,7 +468,7 @@
                       placeholder="添加备注..."></textarea>
             <p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
                 <button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button id="saveBtn" type="button" class="btn btn-primary">保存</button>
             </p>
         </form>
     </div>

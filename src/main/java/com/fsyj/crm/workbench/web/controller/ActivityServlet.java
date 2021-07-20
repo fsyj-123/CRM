@@ -186,4 +186,26 @@ public class ActivityServlet extends BaseServlet {
             PrintJson.printJsonFlag(response, false);
         }
     }
+
+    public void saveRemark(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String content = request.getParameter("content");
+            String activityId = request.getParameter("activityId");
+            User user = (User) request.getSession().getAttribute("user");
+            String creator = user.getId();
+            ActivityRemark activityRemark = new ActivityRemark();
+            activityRemark.setId(UUIDUtil.getUUID());
+            activityRemark.setNoteContent(content);
+            activityRemark.setCreateTime(DateTimeUtil.getSysTime());
+            activityRemark.setCreateBy(creator);
+            activityRemark.setEditFlag("0");
+            activityRemark.setActivityId(activityId);
+            ActivityRemarkService service = (ActivityRemarkService) ServiceFactory.getService(new ActivityRemarkServiceImpl());
+            service.createRemark(activityRemark);
+            PrintJson.printJsonFlag(response,true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
 }

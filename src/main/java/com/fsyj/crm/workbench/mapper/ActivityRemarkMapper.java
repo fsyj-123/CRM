@@ -22,4 +22,6 @@ public interface ActivityRemarkMapper {
     void deleteById(@Param("id") String id);
 
     void updateById(@Param("id") String id, @Param("content") String content, @Param("editor") String editor, @Param("editTime") String editTime);
+
+    void inseartMark(@Param("remark") ActivityRemark activityRemark);
 }
