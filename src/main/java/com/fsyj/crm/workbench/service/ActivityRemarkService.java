@@ -9,4 +9,8 @@ import java.util.List;
  */
 public interface ActivityRemarkService {
     List<ActivityRemark> getRemarkList(String id);
+
+    void deleteRemark(String id);
+
+    void updateRemark(String id, String content, String editor);
 }

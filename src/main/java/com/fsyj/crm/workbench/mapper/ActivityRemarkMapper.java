@@ -18,4 +18,8 @@ public interface ActivityRemarkMapper {
     int deleteByAcIds(@Param("ids") String[] ids);
 
     List<ActivityRemark> queryByActivityId(@Param("id") String id);
+
+    void deleteById(@Param("id") String id);
+
+    void updateById(@Param("id") String id, @Param("content") String content, @Param("editor") String editor, @Param("editTime") String editTime);
 }

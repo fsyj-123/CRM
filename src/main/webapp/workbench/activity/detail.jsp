@@ -13,6 +13,36 @@
         //默认情况下取消和保存按钮是隐藏的
         let cancelAndSaveBtnDefault = true;
 
+        // 通过Id删除备注
+        function deleteRemark(id) {
+            // 通过ajax动态删除备注，并刷新备注列表
+            $.ajax({
+                url: "workbench/activity.do",
+                data: {
+                    action: "deleteRemark",
+                    id: id
+                },
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    if (data.success) {
+                        showActivityRemark();
+                    } else {
+                        alert("删除失败，请刷新重试")
+                    }
+                }
+            })
+        }
+
+        // 通过ID修改备注
+        function editRemark(id) {
+            $("#noteContent").val($("#" + id).text());
+            // 为修改模态窗口中id隐藏域赋值
+            $("#remarkId").val(id);
+            $("#editRemarkModal").modal("show");
+        }
+
+
         // 展现市场活动备注方法(1、页面加载完毕后，点击修改、删除)
         function showActivityRemark() {
             $.ajax({
@@ -30,26 +60,37 @@
                         let contentNoteHtml = "";
                         // 遍历返回的结果集，拼接备注html
                         $.each(remarks, function (index, item) {
+                            let remarkId = item.id;
+                            console.log(remarkId);
                             contentNoteHtml += "<div class=\"remarkDiv\" style=\"height: 60px;\">"
                             contentNoteHtml += "<img title=\"zhangsan\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">"
                             contentNoteHtml += "<div style=\"position: relative; top: -40px; left: 40px;\">"
-                            contentNoteHtml += "<h5>" + item.noteContent + "</h5>"
+                            contentNoteHtml += "<h5 id='" + remarkId + "'>" + item.noteContent + "</h5>"
                             contentNoteHtml += "<font color=\"gray\">市场活动</font> <font color=\"gray\">-</font> <b>${requestScope.activity.name}</b> <small style=\"color: gray;\">" + (item.editFlag === '0' ? item.createTime : item.editTime) + " 由" + (item.editFlag === '0' ? item.createBy : item.editBy) + "</small>"
                             contentNoteHtml += "<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">"
-                            contentNoteHtml += "<a class=\"myHref\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
+                            contentNoteHtml += "<a class=\"myHref\" onclick=\"editRemark('" + remarkId + "')\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
                             contentNoteHtml += "&nbsp;&nbsp;&nbsp;&nbsp;"
-                            contentNoteHtml += "<a class=\"myHref\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
+                            contentNoteHtml += "<a class=\"myHref\" onclick=\"deleteRemark('" + remarkId + "')\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
                             contentNoteHtml += "</div>"
                             contentNoteHtml += "</div>"
                             contentNoteHtml += "</div>"
                         })
-                        $("#conten-note").html(contentNoteHtml);
+                        $("#content-note").html(contentNoteHtml);
                     } else {
                         alert("页面加载错误，请刷新重试")
                     }
                 }
             })
         }
+
+        /*
+        通过内部直接绑定事件的方式传值时，需要注意穿的值需要用引号包围
+        如：onclick=\"deleteRemark('" + remarkId + "')\"
+         */
+
+        $("#content-note").on("click", $("a[name=delete]"), function () {
+            console.log("aass")
+        })
 
         $(function () {
             $("#remark").focus(function () {
@@ -171,7 +212,43 @@
                     })
                 }
             })
+
+            // 为更新按钮绑定事件
+            $("#updateRemarkBtn").click(function () {
+                let note = $.trim($("#noteContent").val());
+                if (note !== "") {
+                    $.ajax({
+                        url: "workbench/activity.do",
+                        data: {
+                            action: "updateRemark",
+                            id: $("#remarkId").val(),
+                            content: note
+                        },
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.success) {
+                                showActivityRemark();
+                            } else {
+                                alert("更新失败，请重试");
+                            }
+                        }
+                    })
+                    $("#editRemarkModal").modal("hide");
+                } else {
+                    alert("内容不能为空")
+                }
+            })
+
             showActivityRemark();
+            $("#remarkBody").on("mouseover", ".remarkDiv", function () {
+                $(this).children("div").children("div").show();
+            })
+
+            $("#remarkBody").on("mouseout", ".remarkDiv", function () {
+                $(this).children("div").children("div").hide();
+            })
+
         });
 
     </script>
@@ -349,13 +426,13 @@
 </div>
 
 <!-- 备注 -->
-<div style="position: relative; top: 30px; left: 40px;">
+<div id="remarkBody" style="position: relative; top: 30px; left: 40px;">
     <div class="page-header">
         <h4>备注</h4>
     </div>
 
-    <!-- 备注1 -->
-    <div id="conten-note">
+    <!-- 备注 -->
+    <div id="content-note">
 
     </div>
 

@@ -160,4 +160,30 @@ public class ActivityServlet extends BaseServlet {
             PrintJson.printJsonFlag(response, false);
         }
     }
+
+    public void deleteRemark(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String id = request.getParameter("id");
+            ActivityRemarkService service = (ActivityRemarkService) ServiceFactory.getService(new ActivityRemarkServiceImpl());
+            service.deleteRemark(id);
+            PrintJson.printJsonFlag(response,true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String id = request.getParameter("id");
+            String content = request.getParameter("content");
+            User user = (User) request.getSession().getAttribute("user");
+            ActivityRemarkService service = (ActivityRemarkService) ServiceFactory.getService(new ActivityRemarkServiceImpl());
+            service.updateRemark(id,content,user.getId());
+            PrintJson.printJsonFlag(response,true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
 }
