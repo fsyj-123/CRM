@@ -3,5 +3,51 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.workbench.mapper.ClueMapper">
-
+<insert id="save">
+    insert into tbl_clue
+        (
+id,
+fullname,
+appellation,
+owner,
+company,
+job,
+email,
+phone,
+website,
+mphone,
+state,
+source,
+createBy,
+createTime,
+editBy,
+editTime,
+description,
+contactSummary,
+nextContactTime,
+address)
+         VALUES
+        (
+        #{clue.id},
+        #{clue.fullname},
+        #{clue.appellation},
+        #{clue.owner},
+        #{clue.company},
+        #{clue.job},
+        #{clue.email},
+        #{clue.phone},
+        #{clue.website},
+        #{clue.mphone},
+        #{clue.state},
+        #{clue.source},
+        #{clue.createBy},
+        #{clue.createTime},
+        #{clue.editBy},
+        #{clue.editTime},
+        #{clue.description},
+        #{clue.contactSummary},
+        #{clue.nextContactTime},
+        #{clue.address}
+        )
+</insert>
 </mapper>

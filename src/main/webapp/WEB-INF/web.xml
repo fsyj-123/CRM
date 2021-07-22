@@ -25,6 +25,10 @@
         <url-pattern>*.html</url-pattern>
     </filter-mapping>
 
+    <listener>
+        <listener-class>com.fsyj.crm.web.listener.ServletContextListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>UserServlet</servlet-name>
         <servlet-class>com.fsyj.crm.settings.web.controller.UserServlet</servlet-class>
@@ -38,8 +42,18 @@
         <servlet-name>ActivityServlet</servlet-name>
         <servlet-class>com.fsyj.crm.workbench.web.controller.ActivityServlet</servlet-class>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>ActivityServlet</servlet-name>
         <url-pattern>/workbench/activity.do</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ClueServlet</servlet-name>
+        <servlet-class>com.fsyj.crm.workbench.web.controller.ClueServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClueServlet</servlet-name>
+        <url-pattern>/workbench/clue.do</url-pattern>
     </servlet-mapping>
 </web-app>

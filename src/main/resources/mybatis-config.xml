@@ -8,6 +8,13 @@
         <!-- 打印sql日志 -->
         <setting name="logImpl" value="STDOUT_LOGGING" />
     </settings>
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <!--<property name="param1" value="value1"/>-->
+        </plugin>
+    </plugins>
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
@@ -23,5 +30,17 @@
         <mapper class="com.fsyj.crm.settings.mapper.UserMapper"/>
         <mapper class="com.fsyj.crm.workbench.mapper.ActivityMapper"/>
         <mapper class="com.fsyj.crm.workbench.mapper.ActivityRemarkMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ClueActivityRelationMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ClueMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ClueRemarkMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ContactsActivityRelationMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ContactsMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.ContactsRemarkMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.CustomerMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.CustomerRemarkMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.TranHistoryMapper"/>
+        <mapper class="com.fsyj.crm.workbench.mapper.TranMapper"/>
+        <mapper class="com.fsyj.crm.settings.mapper.DicTypeMapper"/>
+        <mapper class="com.fsyj.crm.settings.mapper.DicValueMapper"/>
     </mappers>
 </configuration>

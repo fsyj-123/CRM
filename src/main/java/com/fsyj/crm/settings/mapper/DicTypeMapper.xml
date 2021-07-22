@@ -3,5 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.settings.mapper.DicTypeMapper">
-
+<select id="queryAll" resultType="com.fsyj.crm.settings.bean.DicType">
+    select * from tbl_dic_type;
+</select>
 </mapper>

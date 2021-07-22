@@ -1,28 +1,31 @@
-package com.fsyj.crm.web.listener;
+package com.fsyj.crm.settings.service;
 
 import com.fsyj.crm.settings.bean.DicValue;
-import com.fsyj.crm.settings.service.DicService;
 import com.fsyj.crm.settings.service.impl.DicServiceImpl;
 import com.fsyj.crm.utils.ServiceFactory;
+import org.junit.Test;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author fsyj
- */
-public class ServletContextListener implements javax.servlet.ServletContextListener {
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
+import static org.junit.Assert.*;
+
+public class DicServiceTest {
+
+    @Test
+    public void getDicMap() {
         DicService dicService = (DicService) ServiceFactory.getService(new DicServiceImpl());
         Map<String, List<DicValue>> dicMap = dicService.getDicMap();
         Set<Map.Entry<String, List<DicValue>>> entries = dicMap.entrySet();
-        ServletContext servletContext = sce.getServletContext();
         for (Map.Entry<String, List<DicValue>> entry : entries) {
-            servletContext.setAttribute(entry.getKey(),entry.getValue());
+            List<DicValue> value = entry.getValue();
+            System.out.print(entry.getKey() + ": " );
+            for (DicValue dicValue : value) {
+                System.out.print(dicValue.getText() + ", ");
+            }
+            System.out.println();
         }
     }
 }
