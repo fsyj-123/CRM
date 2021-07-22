@@ -3,13 +3,16 @@
 # Compiled class file
 *.class
 #idea enveriment
-../.idea
+./.idea/
+./4_CRM项目/
 
 # Log file
 *.log
 
 # BlueJ files
 *.ctxt
+
+*.iml
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
