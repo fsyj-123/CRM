@@ -463,7 +463,7 @@
 				</thead>
 				<tbody>
 				<tr>
-					<td><a href="../../../../../4_CRM项目/resource/前端原型/workbench/activity/detail.html" style="text-decoration: none;">发传单</a></td>
+					<td><a href="../../../../../4_CRM项目/resource/前端原型/workbench/activity/detail.jsp" style="text-decoration: none;">发传单</a></td>
 					<td>2020-10-10</td>
 					<td>2020-10-20</td>
 					<td>zhangsan</td>
