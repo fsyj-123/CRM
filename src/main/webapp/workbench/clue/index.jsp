@@ -19,13 +19,43 @@
 
     <script type="text/javascript">
 
-        // 分页
-        function showClues(pageNo,pageSize) {
-            $.ajax({
 
+
+        // 分页
+        function showClues(pageNo, pageSize) {
+            $.ajax({
+                url: "workbench/clue.do",
+                data: {
+                    action: "page",
+                    pageNo: pageNo,
+                    pageSize: pageSize
+                },
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    if (data.success) {
+                        console.log(data.clueList)
+                        let html = "";
+                        $.each(data.clueList, function (index, item) {
+                            html += "<tr>"
+                            html += "<td><input type=\"checkbox\"/></td>"
+                            html += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href=\'workbench/clue.do?action=detail&id="+item.id+"\';\">" + item.fullname + item.appellation + "</a></td>"
+                            html += "<td>" + item.company + "</td>"
+                            html += "<td>" + item.phone + "</td>"
+                            html += "<td>" + item.mphone + "</td>"
+                            html += "<td>" + item.source + "</td>"
+                            html += "<td>" + item.owner + "</td>"
+                            html += "<td>" + item.state + "</td>"
+                            html += "</tr>"
+                        })
+                        $("#clue-list").html(html)
+                    }
+                }
             })
         }
+
         $(function () {
+            showClues(1, 2)
             // 时间插件
             $(".time").datetimepicker({
                 minView: "month",
@@ -87,8 +117,12 @@
                     type: "post",
                     success: function (data) {
                         if (data.success) {
+                            // 关闭模态窗口
+                            $("#createClueModal").modal("hide");
                             // 重置表单
+                            $("#form-clue")[0].reset();
                             // 刷新列表
+                            showClues(1, 2);
                         } else {
                             alert("保存失败")
                         }
@@ -112,7 +146,7 @@
                 <h4 class="modal-title" id="myModalLabel">创建线索</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form">
+                <form class="form-horizontal" id="form-clue" role="form">
 
                     <div class="form-group">
                         <label for="create-clueOwner" class="col-sm-2 control-label">所有者<span
@@ -524,18 +558,8 @@
                     <td>线索状态</td>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td><input type="checkbox"/></td>
-                    <td><a style="text-decoration: none; cursor: pointer;"
-                           onclick="window.location.href='workbench/clue/detail.jsp';">李四先生</a></td>
-                    <td>动力节点</td>
-                    <td>010-84846003</td>
-                    <td>12345678901</td>
-                    <td>广告</td>
-                    <td>zhangsan</td>
-                    <td>已联系</td>
-                </tr>
+                <tbody id="clue-list">
+
                 </tbody>
             </table>
         </div>

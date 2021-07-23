@@ -5,6 +5,7 @@ import com.fsyj.crm.settings.service.UserService;
 import com.fsyj.crm.settings.service.impl.UserServiceImpl;
 import com.fsyj.crm.utils.*;
 import com.fsyj.crm.web.controller.BaseServlet;
+import com.fsyj.crm.workbench.bean.Activity;
 import com.fsyj.crm.workbench.bean.Clue;
 import com.fsyj.crm.workbench.service.ClueService;
 import com.fsyj.crm.workbench.service.impl.ClueServiceImpl;
@@ -33,6 +34,7 @@ public class ClueServlet extends BaseServlet {
             PrintJson.printJsonFlag(response, false);
         }
     }
+
     public void saveClue(HttpServletRequest request, HttpServletResponse response) {
         try {
             ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
@@ -45,6 +47,55 @@ public class ClueServlet extends BaseServlet {
             clue.setCreateTime(DateTimeUtil.getSysTime());
             System.out.println(clue);
             clueService.saveClue(clue);
+            PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void page(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+            Integer pageNo = Integer.valueOf(request.getParameter("pageNo"));
+            Integer pageSize = Integer.valueOf(request.getParameter("pageSize"));
+            List<Clue> clueList = clueService.getPageList(pageNo, pageSize);
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("success", true);
+            map.put("clueList", clueList);
+            PrintJson.printJsonObj(response, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        Clue clue = clueService.queryClueById(request.getParameter("id"));
+        request.setAttribute("clue", clue);
+        request.getRequestDispatcher("/workbench/clue/detail.jsp").forward(request, response);
+    }
+
+    public void getRelationship(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+            String clueId = request.getParameter("clueId");
+            List<Activity> activities = clueService.getRelation(clueId);
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("success", true);
+            map.put("relationship", activities);
+            PrintJson.printJsonObj(response, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void removeRelation(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+            clueService.removeRelation(request.getParameter("id"));
             PrintJson.printJsonFlag(response,true);
         } catch (Exception e) {
             e.printStackTrace();
