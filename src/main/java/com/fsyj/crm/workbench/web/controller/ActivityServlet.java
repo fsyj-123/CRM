@@ -85,7 +85,7 @@ public class ActivityServlet extends BaseServlet {
 
     public void deleteActivities(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String[] ids = request.getParameterValues("id[]");
+            String[] ids = request.getParameterValues("id");
             if (ids == null || ids.length == 0) {
                 PrintJson.printJsonFlag(response, false);
                 return;
@@ -203,6 +203,20 @@ public class ActivityServlet extends BaseServlet {
             ActivityRemarkService service = (ActivityRemarkService) ServiceFactory.getService(new ActivityRemarkServiceImpl());
             service.createRemark(activityRemark);
             PrintJson.printJsonFlag(response,true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+    public void listActionByCondition(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String text = request.getParameter("text");
+            String clueId = request.getParameter("clueId");
+            List<Activity> activityList = activityService.getActivityByCondition(text,clueId);
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("success",true);
+            map.put("actionList",activityList);
+            PrintJson.printJsonObj(response, map);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);

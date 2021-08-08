@@ -4,6 +4,7 @@ import com.fsyj.crm.settings.bean.User;
 import com.fsyj.crm.settings.service.UserService;
 import com.fsyj.crm.settings.service.impl.UserServiceImpl;
 import com.fsyj.crm.utils.*;
+import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.web.controller.BaseServlet;
 import com.fsyj.crm.workbench.bean.Activity;
 import com.fsyj.crm.workbench.bean.Clue;
@@ -13,6 +14,7 @@ import com.fsyj.crm.workbench.service.impl.ClueServiceImpl;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +61,8 @@ public class ClueServlet extends BaseServlet {
             ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
             Integer pageNo = Integer.valueOf(request.getParameter("pageNo"));
             Integer pageSize = Integer.valueOf(request.getParameter("pageSize"));
-            List<Clue> clueList = clueService.getPageList(pageNo, pageSize);
-            HashMap<String, Object> map = new HashMap<>(2);
-            map.put("success", true);
-            map.put("clueList", clueList);
-            PrintJson.printJsonObj(response, map);
+            PageNavigate<Clue> clueList = clueService.getPageList(pageNo, pageSize);
+            PrintJson.printJsonObj(response, clueList);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);
@@ -86,6 +85,19 @@ public class ClueServlet extends BaseServlet {
             map.put("success", true);
             map.put("relationship", activities);
             PrintJson.printJsonObj(response, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+    public void bind(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+            String activityIds = request.getParameter("activityId");
+            String[] aids = activityIds.substring(1, activityIds.length() - 1).split(",");
+            String clueId = request.getParameter("clueId");
+            clueService.bindActivity(aids,clueId);
+            PrintJson.printJsonFlag(response,true);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);

@@ -63,4 +63,11 @@ public class ActivityServiceImpl implements ActivityService {
         assert id != null && !"".equals(id);
         return mapper.queryActivityById(id);
     }
+
+    @Override
+    public List<Activity> getActivityByCondition(String text, String clueId) {
+        ActivityMapper mapper = SqlSessionUtil.getSqlSession().getMapper(ActivityMapper.class);
+        assert text != null && !"".equals(text);
+        return mapper.fuzzyQuery(text,clueId);
+    }
 }

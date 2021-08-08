@@ -7,6 +7,11 @@ import com.fsyj.crm.workbench.bean.ClueActivityRelation;
  */
 public interface ClueActivityRelationMapper {
 
-	
 
+    /**
+     * 绑定市场活动
+     * @param relation
+     * @return
+     */
+    int bind(ClueActivityRelation relation);
 }

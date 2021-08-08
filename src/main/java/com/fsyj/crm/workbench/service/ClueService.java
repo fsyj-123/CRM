@@ -1,5 +1,6 @@
 package com.fsyj.crm.workbench.service;
 
+import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.workbench.bean.Activity;
 import com.fsyj.crm.workbench.bean.Clue;
 
@@ -23,7 +24,7 @@ public interface ClueService {
      * @param pageSize
      * @return List
      */
-    List<Clue> getPageList(Integer pageNo, Integer pageSize);
+    PageNavigate<Clue> getPageList(Integer pageNo, Integer pageSize);
 
     /**
      * 根据Id查Clue
@@ -47,4 +48,12 @@ public interface ClueService {
      * @param relationId
      */
     void removeRelation(String relationId);
+
+    /**
+     * 绑定市场活动
+     * @param activityIds
+     * @param clueId
+     * @throws Exception
+     */
+    void bindActivity(String[] activityIds, String clueId) throws Exception;
 }

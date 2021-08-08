@@ -47,4 +47,9 @@ public interface ClueMapper {
      * @param relationId
      */
     void deleteRelation(@Param("relationId") String relationId);
+
+    /**
+     * 获取总页数
+     */
+    Integer getCount();
 }

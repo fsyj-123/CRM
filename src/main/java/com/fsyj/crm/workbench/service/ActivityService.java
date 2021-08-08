@@ -3,6 +3,7 @@ package com.fsyj.crm.workbench.service;
 import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.workbench.bean.Activity;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ActivityService {
@@ -17,4 +18,12 @@ public interface ActivityService {
     void updateActivity(Activity activity);
 
     Activity getDetailByID(String id);
+
+    /**
+     * 通过条件模糊查询
+     * @param text condition
+     * @param clueId
+     * @return list
+     */
+    List<Activity> getActivityByCondition(String text, String clueId);
 }

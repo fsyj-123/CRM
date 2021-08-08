@@ -51,8 +51,29 @@
         /*
         利用pageHelper进行查询时不能在末尾加分号
         */
-        select *
-        from tbl_clue
+        select
+            tc.id,
+            tc.fullname,
+            tc.appellation,
+            tu.name as owner,
+            tc.company,
+            tc.job,
+            tc.email,
+            tc.phone,
+            tc.website,
+            tc.mphone,
+            tc.state,
+            tc.source,
+            tc.createBy,
+            tc.createTime,
+            tc.editBy,
+            tc.editTime,
+            tc.description,
+            tc.contactSummary,
+            tc.nextContactTime,
+            tc.address
+        from tbl_clue tc
+        inner join tbl_user tu on tc.owner = tu.id
         order by createTime desc
     </select>
 

@@ -13,10 +13,10 @@ public class ClueServiceTest {
     @Test
     public void getPageList() {
         ClueService service = new ClueServiceImpl();
-        List<Clue> pageList = service.getPageList(1, 3);
-        for (Clue clue : pageList) {
-            System.out.println(clue);
-        }
+//        List<Clue> pageList = service.getPageList(1, 3);
+//        for (Clue clue : pageList) {
+//            System.out.println(clue);
+//        }
     }
 
     @Test

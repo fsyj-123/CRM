@@ -23,4 +23,13 @@ public interface ActivityMapper {
     void updateById(@Param("id") String id, @Param("activity") Activity activity);
 
     Activity queryActivityById(@Param("id") String id);
+
+    /**
+     * 根据条件模糊查询
+     *
+     * @param text condition
+     * @param clueId
+     * @return
+     */
+    List<Activity> fuzzyQuery(@Param("condition") String text, @Param("clueId") String clueId);
 }

@@ -3,8 +3,8 @@
 # Compiled class file
 *.class
 #idea enveriment
-./.idea/
-./4_CRM项目/
+.idea/
+4_CRM项目/
 
 # Log file
 *.log

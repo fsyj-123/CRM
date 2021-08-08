@@ -4,4 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.workbench.mapper.ClueActivityRelationMapper">
 
+    <insert id="bind" parameterType="com.fsyj.crm.workbench.bean.ClueActivityRelation">
+        insert into tbl_clue_activity_relation values (#{id},#{clueId},#{activityId})
+    </insert>
 </mapper>

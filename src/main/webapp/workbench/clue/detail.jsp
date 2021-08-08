@@ -13,16 +13,23 @@
         //默认情况下取消和保存按钮是隐藏的
         let cancelAndSaveBtnDefault = true;
 
+        function resetModal() {
+            // 清空搜索框及搜索结果
+            $("#search-name").val("")
+            $("#bindBody").html("")
+            // 取消选中状态
+            $("#check").prop("checked",false);
+        }
         function removeRelation(id) {
             $.ajax({
-                url:"workbench/clue.do",
+                url: "workbench/clue.do",
                 data: {
-                    action:"removeRelation",
-                    id:id
+                    action: "removeRelation",
+                    id: id
                 },
                 dataType: "json",
-                type:"post",
-                success:function (data) {
+                type: "post",
+                success: function (data) {
                     if (data.success) {
                         showRelationActivity();
                     } else {
@@ -51,7 +58,7 @@
                             html += "<td>" + item.startDate + "</td>"
                             html += "<td>" + item.endDate + "</td>"
                             html += "<td>" + item.owner + "</td>"
-                            html += "<td><a href=\"javascript:void(0);\" onclick='removeRelation(\"" + item.id +"\")' style=\"text-decoration: none;\"><span class=\"glyphicon glyphicon-remove\"></span>解除关联</a></td>"
+                            html += "<td><a href=\"javascript:void(0);\" onclick='removeRelation(\"" + item.id + "\")' style=\"text-decoration: none;\"><span class=\"glyphicon glyphicon-remove\"></span>解除关联</a></td>"
                             html += "</tr>"
                         })
                         $("#activity-related").html(html)
@@ -59,7 +66,6 @@
                 }
             })
         }
-
 
 
         $(function () {
@@ -82,6 +88,86 @@
                 cancelAndSaveBtnDefault = true;
             });
 
+            // 输入框敲击回车，后台查询数据
+            $("#search-name").keydown(function (event) {
+                if (event.keyCode === 13) {
+                    /*
+                    1、获取输入框内容
+                    2、将数据解析显示
+                     */
+                    let text = $.trim($(this).val());
+                    if (text === "") {
+                        alert("输入不能为空")
+                        return false;
+                    }
+                    $.ajax({
+                        url: "workbench/activity.do",
+                        data: {
+                            action: "listActionByCondition",
+                            // 传递线索id，排除已经关联过的activity
+                            clueId: "${requestScope.clue.id}",
+                            text: text
+                        },
+                        dataType: "json",
+                        type: "get",
+                        success: function (data) {
+                            console.log("test2")
+                            if (data.success) {
+                                console.log("test")
+                                let html = "";
+                                $.each(data.actionList, function (index, item) {
+                                    console.log(item)
+                                    html += "<tr>";
+                                    html += "<td><input name='box' type=\"checkbox\"/ value=" + item.id + "></td>";
+                                    html += "<td>" + item.name + "</td>";
+                                    html += "<td>" + item.startDate + "</td>";
+                                    html += "<td>" + item.endDate + "</td>";
+                                    html += "<td>" + item.owner + "</td>";
+                                    html += "</tr>";
+                                })
+                                $("#bindBody").html(html);
+                            }
+                        }
+                    })
+                    return false;
+                }
+
+            })
+
+            $("#check").click(function () {
+                $("input[name=box]").prop("checked", this.checked);
+            })
+            $("#bind").click(function () {
+                // 拼接activityId
+                let $input = $("input[name=box]:checked");
+                if ($input.length === 0) {
+                    alert("请选择至少一条记录")
+                } else {
+                    let activityIds = [];
+                    for (let i = 0; i < $input.length; i++) {
+                        activityIds[i] = $input[i].value;
+                    }
+                    activityIds = JSON.stringify(activityIds);
+                    console.log(activityIds)
+                    $.ajax({
+                        url: "workbench/clue.do",
+                        data: {
+                            action: "bind",
+                            activityId: activityIds,
+                            clueId: "${requestScope.clue.id}"
+                        },
+                        dataType: "json",
+                        type: "post",
+                        success: function (data) {
+                            resetModal();
+                            showRelationActivity();
+                        }
+                    })
+                }
+                // 关闭窗口
+                $("#bundModal").modal("hide");
+            })
+
             $(".remarkDiv").mouseover(function () {
                 $(this).children("div").children("div").show();
             });
@@ -97,6 +183,7 @@
             $(".myHref").mouseout(function () {
                 $(this).children("span").css("color", "#E6E6E6");
             });
+
         });
 
     </script>
@@ -118,7 +205,7 @@
                 <div class="btn-group" style="position: relative; top: 18%; left: 8px;">
                     <form class="form-inline" role="form">
                         <div class="form-group has-feedback">
-                            <input type="text" class="form-control" style="width: 300px;"
+                            <input type="text" class="form-control" id="search-name" style="width: 300px;"
                                    placeholder="请输入市场活动名称，支持模糊查询">
                             <span class="glyphicon glyphicon-search form-control-feedback"></span>
                         </div>
@@ -127,7 +214,7 @@
                 <table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
                     <thead>
                     <tr style="color: #B3B3B3;">
-                        <td><input type="checkbox"/></td>
+                        <td><input type="checkbox" id="check"/></td>
                         <td>名称</td>
                         <td>开始日期</td>
                         <td>结束日期</td>
@@ -135,20 +222,27 @@
                         <td></td>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
+                    <tbody id="bindBody">
+                    <%--<tr>
                         <td><input type="checkbox"/></td>
                         <td>发传单</td>
                         <td>2020-10-10</td>
                         <td>2020-10-20</td>
                         <td>zhangsan</td>
                     </tr>
+                    <tr>
+                        <td><input type="checkbox"/></td>
+                        <td>发传单</td>
+                        <td>2020-10-10</td>
+                        <td>2020-10-20</td>
+                        <td>zhangsan</td>
+                    </tr>--%>
                     </tbody>
                 </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+                <button type="button" class="btn btn-primary" id="bind">关联</button>
             </div>
         </div>
     </div>
