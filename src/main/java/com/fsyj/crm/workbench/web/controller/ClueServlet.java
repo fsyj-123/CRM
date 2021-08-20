@@ -6,23 +6,24 @@ import com.fsyj.crm.settings.service.impl.UserServiceImpl;
 import com.fsyj.crm.utils.*;
 import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.web.controller.BaseServlet;
-import com.fsyj.crm.workbench.bean.Activity;
-import com.fsyj.crm.workbench.bean.Clue;
+import com.fsyj.crm.workbench.bean.*;
 import com.fsyj.crm.workbench.service.ClueService;
+import com.fsyj.crm.workbench.service.ClueRemarkService;
+import com.fsyj.crm.workbench.service.impl.ClueRemarkServiceImpl;
 import com.fsyj.crm.workbench.service.impl.ClueServiceImpl;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author fsyj
  */
 public class ClueServlet extends BaseServlet {
+    public final static String TRUE = "true";
+    public final static String FALSE = "false";
+
     public void getUserList(HttpServletRequest request, HttpServletResponse response) {
         try {
             UserService service = (UserService) ServiceFactory.getService(new UserServiceImpl());
@@ -90,14 +91,15 @@ public class ClueServlet extends BaseServlet {
             PrintJson.printJsonFlag(response, false);
         }
     }
+
     public void bind(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
             String activityIds = request.getParameter("activityId");
             String[] aids = activityIds.substring(1, activityIds.length() - 1).split(",");
             String clueId = request.getParameter("clueId");
-            clueService.bindActivity(aids,clueId);
-            PrintJson.printJsonFlag(response,true);
+            clueService.bindActivity(aids, clueId);
+            PrintJson.printJsonFlag(response, true);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);
@@ -108,7 +110,55 @@ public class ClueServlet extends BaseServlet {
         try {
             ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
             clueService.removeRelation(request.getParameter("id"));
-            PrintJson.printJsonFlag(response,true);
+            PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void convert(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            ClueService clueService = (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+
+            String checked = request.getParameter("checked");
+            String clueId = request.getParameter("clueId");
+            User creator = (User) request.getSession().getAttribute("user");
+            Tran tran = null;
+            if (TRUE.equals(checked)) {
+                tran = BeanUtil.getObjectFromMap(request.getParameterMap(), Tran.class);
+            }
+            clueService.convert(clueId, tran, creator);
+            PrintJson.printJsonFlag(response, true);
+        } catch (Exception e) {
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void clueRemarkList(HttpServletRequest request, HttpServletResponse response) {
+        ClueRemarkService clueService = (ClueRemarkService) ServiceFactory.getService(new ClueRemarkServiceImpl());
+        try {
+            String id = request.getParameter("id");
+            List<ActivityRemark> remarkList = clueService.getRemarkList(id);
+            System.out.println(remarkList);
+            HashMap<String, Object> map = new HashMap<>(2);
+            map.put("remarkList", remarkList);
+            map.put("success", true);
+            PrintJson.printJsonObj(response, map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PrintJson.printJsonFlag(response, false);
+        }
+    }
+
+    public void saveRemark(HttpServletRequest request, HttpServletResponse response) {
+        ClueRemarkService clueService = (ClueRemarkService) ServiceFactory.getService(new ClueRemarkServiceImpl());
+        try {
+            String content = request.getParameter("content");
+            String clueId = request.getParameter("clueId");
+            User user = (User) request.getSession().getAttribute("user");
+            clueService.addRemark(content, user, clueId);
+            PrintJson.printJsonFlag(response, true);
         } catch (Exception e) {
             e.printStackTrace();
             PrintJson.printJsonFlag(response, false);

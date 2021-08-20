@@ -1,6 +1,6 @@
 package com.fsyj.crm.web.filter;
 
-import com.fsyj.crm.utils.constStrings.ProjectPath;
+import com.fsyj.crm.utils.constStrings.Path;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class LoginFilter implements Filter {
         if (session.getAttribute("user") != null || letSet.contains(path)) {
             filterChain.doFilter(req,resp);
         } else {
-            response.sendRedirect(ProjectPath.PROJECT_PATH + "login.jsp");
+            response.sendRedirect(Path.PROJECT_PATH + "login.jsp");
         }
     }
 }

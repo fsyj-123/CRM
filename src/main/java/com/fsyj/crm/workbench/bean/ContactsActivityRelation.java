@@ -24,7 +24,13 @@ public class ContactsActivityRelation {
 	public void setActivityId(String activityId) {
 		this.activityId = activityId;
 	}
-	
-	
-	
+
+	@Override
+	public String toString() {
+		return "ContactsActivityRelation{" +
+				"id='" + id + '\'' +
+				", contactsId='" + contactsId + '\'' +
+				", activityId='" + activityId + '\'' +
+				'}';
+	}
 }

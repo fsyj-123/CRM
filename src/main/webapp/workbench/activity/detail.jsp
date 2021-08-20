@@ -56,7 +56,6 @@
                 success: function (data) {
                     if (data.success) {
                         let remarks = data.remarkList;
-                        console.log(remarks);
                         let contentNoteHtml = "";
                         // 遍历返回的结果集，拼接备注html
                         $.each(remarks, function (index, item) {
@@ -242,6 +241,7 @@
                 }
             })
 
+            // 保存备注信息
             $("#saveBtn").click(function () {
                 let remark = $.trim($("#remark").val());
                 if (remark !== "") {

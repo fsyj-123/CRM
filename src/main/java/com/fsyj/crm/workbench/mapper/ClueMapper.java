@@ -49,7 +49,14 @@ public interface ClueMapper {
     void deleteRelation(@Param("relationId") String relationId);
 
     /**
-     * 获取总页数
+     * 获取clue总记录数
+     * @return
      */
     Integer getCount();
+
+    /**
+     * 通过clueId删除
+     * @param id
+     */
+    void deleteById(@Param("id") String id);
 }

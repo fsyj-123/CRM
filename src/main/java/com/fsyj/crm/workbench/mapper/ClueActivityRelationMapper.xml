@@ -7,4 +7,12 @@
     <insert id="bind" parameterType="com.fsyj.crm.workbench.bean.ClueActivityRelation">
         insert into tbl_clue_activity_relation values (#{id},#{clueId},#{activityId})
     </insert>
+
+    <select id="queryByClueId" resultType="com.fsyj.crm.workbench.bean.ClueActivityRelation">
+        select * from tbl_clue_activity_relation where clueId = #{clueId}
+    </select>
+
+    <delete id="deleteById">
+        delete from tbl_clue_activity_relation where id = #{id}
+    </delete>
 </mapper>

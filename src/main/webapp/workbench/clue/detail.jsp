@@ -39,6 +39,9 @@
             })
         }
 
+        function convert() {
+            window.location.href='workbench/clue/convert.jsp?id=${requestScope.clue.id}&fullname=${requestScope.clue.fullname}&appellation=${requestScope.clue.appellation}&company=${requestScope.clue.company}&owner=${requestScope.clue.owner}';
+        }
         function showRelationActivity() {
             $.ajax({
                 url: "workbench/clue.do",
@@ -67,9 +70,80 @@
             })
         }
 
+        // 备注展现
+        // 通过Id删除备注  ------------------- 暂不予以实现
+        /*function deleteRemark(id) {
+            // 通过ajax动态删除备注，并刷新备注列表
+            $.ajax({
+                url: "workbench/clue.do",
+                data: {
+                    action: "deleteRemark",
+                    id: id
+                },
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    if (data.success) {
+                        showActivityRemark();
+                    } else {
+                        alert("删除失败，请刷新重试")
+                    }
+                }
+            })
+        }
+        // 通过ID修改备注
+        function editRemark(id) {
+            $("#noteContent").val($("#" + id).text());
+            // 为修改模态窗口中id隐藏域赋值
+            $("#remarkId").val(id);
+            $("#editRemarkModal").modal("show");
+        }*/
+
+
+        // 展现市场活动备注方法(1、页面加载完毕后，点击修改、删除)
+        function showActivityRemark() {
+            $.ajax({
+                url: "workbench/clue.do",
+                data: {
+                    action: "clueRemarkList",
+                    id: "${requestScope.clue.id}"
+                },
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    if (data.success) {
+                        let remarks = data.remarkList;
+                        let contentNoteHtml = "";
+                        // 遍历返回的结果集，拼接备注html
+                        $.each(remarks, function (index, item) {
+                            let remarkId = item.id;
+                            contentNoteHtml += "<div class=\"remarkDiv\" style=\"height: 60px;\">"
+                            contentNoteHtml += "<img title=\"zhangsan\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">"
+                            contentNoteHtml += "<div style=\"position: relative; top: -40px; left: 40px;\">"
+                            contentNoteHtml += "<h5 id='" + remarkId + "'>" + item.noteContent + "</h5>"
+                            contentNoteHtml += "<font color=\"gray\">${requestScope.clue.company}</font> <font color=\"gray\">-</font> <b>${requestScope.clue.fullname}${requestScope.clue.appellation}</b> <small style=\"color: gray;\">" + (item.editFlag === '0' ? item.createTime : item.editTime) + " 由" + (item.editFlag === '0' ? item.createBy : item.editBy) + "</small>"
+                            contentNoteHtml += "<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">"
+                            contentNoteHtml += "<a class=\"myHref\" onclick=\"editRemark('" + remarkId + "')\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
+                            contentNoteHtml += "&nbsp;&nbsp;&nbsp;&nbsp;"
+                            contentNoteHtml += "<a class=\"myHref\" onclick=\"deleteRemark('" + remarkId + "')\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #FF0000;\"></span></a>"
+                            contentNoteHtml += "</div>"
+                            contentNoteHtml += "</div>"
+                            contentNoteHtml += "</div>"
+                        })
+                        $("#content-note").html(contentNoteHtml);
+                    } else {
+                        alert("页面加载错误，请刷新重试")
+                    }
+                }
+            })
+        }
+
 
         $(function () {
             showRelationActivity();
+
+            showActivityRemark();
+
             $("#remark").focus(function () {
                 if (cancelAndSaveBtnDefault) {
                     //设置remarkDiv的高度为130px
@@ -79,6 +153,31 @@
                     cancelAndSaveBtnDefault = false;
                 }
             });
+
+            // 保存备注信息
+            $("#saveBtn").click(function () {
+                let remark = $.trim($("#remark").val());
+                if (remark !== "") {
+                    $.ajax({
+                        url:"workbench/clue.do",
+                        data:{
+                            action:"saveRemark",
+                            content:remark,
+                            clueId:"${requestScope.clue.id}"
+                        },
+                        dataType:"json",
+                        type:"post",
+                        success:function (data) {
+                            if(data.success) {
+                                $("#remark").val("")
+                                showActivityRemark()
+                            } else {
+                                alert("保存失败，请重试")
+                            }
+                        }
+                    })
+                }
+            })
 
             $("#cancelBtn").click(function () {
                 //显示
@@ -111,9 +210,7 @@
                         dataType: "json",
                         type: "get",
                         success: function (data) {
-                            console.log("test2")
                             if (data.success) {
-                                console.log("test")
                                 let html = "";
                                 $.each(data.actionList, function (index, item) {
                                     console.log(item)
@@ -421,7 +518,7 @@
         </h3>
     </div>
     <div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
-        <button type="button" class="btn btn-default" onclick="window.location.href='workbench/clue/convert.jsp';"><span
+        <button type="button" class="btn btn-default" onclick="convert()"><span
                 class="glyphicon glyphicon-retweet"></span> 转换
         </button>
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editClueModal"><span
@@ -526,8 +623,10 @@
     <div class="page-header">
         <h4>备注</h4>
     </div>
+    <div id="content-note">
 
-    <!-- 备注1 -->
+    </div>
+    <%--<!-- 备注1 -->
     <div class="remarkDiv" style="height: 60px;">
         <img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
         <div style="position: relative; top: -40px; left: 40px;">
@@ -542,24 +641,7 @@
                                                                    style="font-size: 20px; color: #E6E6E6;"></span></a>
             </div>
         </div>
-    </div>
-
-    <!-- 备注2 -->
-    <div class="remarkDiv" style="height: 60px;">
-        <img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
-        <div style="position: relative; top: -40px; left: 40px;">
-            <h5>呵呵！</h5>
-            <font color="gray">线索</font> <font color="gray">-</font> <b>李四先生-动力节点</b> <small style="color: gray;">
-            2017-01-22 10:20:10 由zhangsan</small>
-            <div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
-                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit"
-                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove"
-                                                                   style="font-size: 20px; color: #E6E6E6;"></span></a>
-            </div>
-        </div>
-    </div>
+    </div>--%>
 
     <div id="remarkDiv" style="background-color: #E6E6E6; width: 870px; height: 90px;">
         <form role="form" style="position: relative;top: 10px; left: 10px;">
@@ -567,7 +649,7 @@
                       placeholder="添加备注..."></textarea>
             <p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
                 <button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button id="saveBtn" type="button" class="btn btn-primary">保存</button>
             </p>
         </form>
     </div>

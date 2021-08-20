@@ -124,4 +124,12 @@
     <delete id="deleteRelation">
         delete from tbl_clue_activity_relation where id = #{relationId};
     </delete>
+
+    <select id="getCount">
+        select count(id) from tbl_clue
+    </select>
+
+    <delete id="deleteById">
+        delete from tbl_clue where id = #{id}
+    </delete>
 </mapper>

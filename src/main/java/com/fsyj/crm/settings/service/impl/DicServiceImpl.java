@@ -21,6 +21,7 @@ public class DicServiceImpl implements DicService {
         DicTypeMapper typeMapper = SqlSessionUtil.getSqlSession().getMapper(DicTypeMapper.class);
         DicValueMapper valueMapper = SqlSessionUtil.getSqlSession().getMapper(DicValueMapper.class);
         List<DicType> dicTypes = typeMapper.queryAll();
+        // 获取dicValue
         List<DicValue> dicValues = valueMapper.getAllDicValue();
         int temp = dicValues.size() / dicTypes.size();
         Map<String, List<DicValue>> result = new HashMap<>(dicTypes.size());

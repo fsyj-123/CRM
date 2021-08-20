@@ -114,10 +114,12 @@
         from tbl_activity ta
                  inner join tbl_user tu on ta.owner = tu.id
         where ta.name like '%' #{condition} '%'
-          and ta.id not in (
-            select activityId
-            from tbl_clue_activity_relation
-            where clueId = #{clueId}
-        )
+          <if test="#{clueId} != null">
+              and ta.id not in (
+              select activityId
+              from tbl_clue_activity_relation
+              where clueId = #{clueId}
+              )
+          </if>
     </select>
 </mapper>

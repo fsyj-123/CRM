@@ -3,5 +3,53 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.workbench.mapper.ContactsMapper">
+    <select id="queryByFullName" resultType="com.fsyj.crm.workbench.bean.Contacts">
+        select tc.id,
+               tu2.name as owner,
+               tc.source,
+               tc.customerId,
+               tc.fullname,
+               tc.appellation,
+               tc.email,
+               tc.mphone,
+               tc.job,
+               tc.birth,
+               tu1.name as createBy,
+               tc.createTime,
+               tu3.name as editBy,
+               tc.editTime,
+               tc.description,
+               tc.contactSummary,
+               tc.nextContactTime,
+               tc.address
+        from tbl_contacts tc
+                 inner join tbl_user tu1 on tc.createBy = tu1.id
+                 inner join tbl_user tu2 on tc.owner = tu2.id
+                 left join tbl_user tu3 on tc.editBy = tu3.id
+        where fullname = #{fullName};
+    </select>
 
+    <insert id="create" parameterType="com.fsyj.crm.workbench.bean.Contacts">
+        insert into tbl_contacts (id, owner, source, customerId, fullname, appellation, email, mphone, job, birth,
+                                  createBy, createTime, editBy, editTime, description, contactSummary, nextContactTime,
+                                  address)
+        VALUES (#{id},
+                #{owner},
+                #{source},
+                #{customerId},
+                #{fullname},
+                #{appellation},
+                #{email},
+                #{mphone},
+                #{job},
+                #{birth},
+                #{createBy},
+                #{createTime},
+                #{editBy},
+                #{editTime},
+                #{description},
+                #{contactSummary},
+                #{nextContactTime},
+                #{address})
+    </insert>
 </mapper>

@@ -108,3 +108,21 @@ clone：将远程库项目完整克隆到本地库
 ### Util工具层：  
 该层主要是编写Util实体类，负责存放相关工具类
 
+## 项目知识点
+
+1. jquery封装表单数据为json
+	1. 给你的form表单取个id值    id="zq_form"
+	2. 然后js封装  【温馨下提示：这里可将此类多处会使用到的代码抽取出来单独存放去引入】
+	   `//序列化表单字段为json对象
+	   $.fn.serializeFormToJson = function(){
+            let arr = $(this).serializeArray();//form表单数据 name：value
+            let param = {};
+            $.each(arr,function(i,obj){ //将form表单数据封装成json对象
+                param[obj.name] = obj.value;
+            })
+            return param;
+        }`
+	3. 使用
+	   `var formData = $("#zq_form").serializeFormToJson();
+	   console.debug(formData);`
+

@@ -3,5 +3,44 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.workbench.mapper.CustomerMapper">
+    <select id="queryByName" resultType="com.fsyj.crm.workbench.bean.Customer">
+        select tc.id,
+               u1.name as owner,
+               tc.name,
+               tc.website,
+               tc.phone,
+               u2.name as createBy,
+               tc.createTime,
+               u3.name as editBy,
+               tc.editTime,
+               tc.contactSummary,
+               tc.nextContactTime,
+               tc.description,
+               tc.address
+        from tbl_customer tc
+                 inner join tbl_user u1
+                            on tc.owner = u1.id
+                 inner join tbl_user u2
+                            on u2.id = tc.createBy
+                 left join tbl_user u3
+                           on u3.id = tc.editBy
+    </select>
 
+    <insert id="createCustom" parameterType="com.fsyj.crm.workbench.bean.Customer">
+        insert into tbl_customer (id, owner, name, website, phone, createBy, createTime, editBy, editTime,
+                                  contactSummary, nextContactTime, description, address)
+        VALUES (#{id},
+                #{owner},
+                #{name},
+                #{website},
+                #{phone},
+                #{createBy},
+                #{createTime},
+                #{editBy},
+                #{editTime},
+                #{contactSummary},
+                #{nextContactTime},
+                #{description},
+                #{address})
+    </insert>
 </mapper>

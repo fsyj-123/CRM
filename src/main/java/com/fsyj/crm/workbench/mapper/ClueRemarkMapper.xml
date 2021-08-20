@@ -4,4 +4,58 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fsyj.crm.workbench.mapper.ClueRemarkMapper">
 
+    <select id="listById" resultType="com.fsyj.crm.workbench.bean.ActivityRemark">
+        select tar.id,
+               tar.noteContent,
+               tar.createTime,
+               tu1.name as createBy,
+               tar.editTime,
+               tu2.name as editBy,
+               tar.editFlag,
+               tar.clueId
+        from tbl_clue_remark tar
+                 inner join tbl_user tu1
+                            on tar.createBy = tu1.id
+                 left join tbl_user tu2
+                           on tar.editBy = tu2.id
+        where tar.clueId = #{id}
+        order by tar.createTime;
+    </select>
+
+    <insert id="addRemark" parameterType="com.fsyj.crm.workbench.bean.ClueRemark">
+        insert into tbl_clue_remark (id, noteContent, createBy, createTime, editBy, editTime, editFlag, clueId)
+        VALUES
+(
+        #{id},
+        #{noteContent},
+        #{createBy},
+        #{createTime},
+        #{editBy},
+        #{editTime},
+        #{editFlag},
+        #{clueId}
+)
+    </insert>
+
+    <select id="queryById" resultType="com.fsyj.crm.workbench.bean.ClueRemark">
+        select tar.id,
+               tar.noteContent,
+               tar.createTime,
+               tu1.name as createBy,
+               tar.editTime,
+               tu2.name as editBy,
+               tar.editFlag,
+               tar.clueId
+        from tbl_clue_remark tar
+                 inner join tbl_user tu1
+                            on tar.createBy = tu1.id
+                 left join tbl_user tu2
+                           on tar.editBy = tu2.id
+        where tar.clueId = #{clueId}
+        order by tar.createTime;
+    </select>
+
+    <delete id="deleteRemarkById">
+        delete from tbl_clue_remark where id = #{id}
+    </delete>
 </mapper>

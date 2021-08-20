@@ -1,8 +1,11 @@
 package com.fsyj.crm.workbench.service;
 
+import com.fsyj.crm.settings.bean.User;
 import com.fsyj.crm.vo.PageNavigate;
 import com.fsyj.crm.workbench.bean.Activity;
+import com.fsyj.crm.workbench.bean.ActivityRemark;
 import com.fsyj.crm.workbench.bean.Clue;
+import com.fsyj.crm.workbench.bean.Tran;
 
 import java.util.List;
 
@@ -56,4 +59,15 @@ public interface ClueService {
      * @throws Exception
      */
     void bindActivity(String[] activityIds, String clueId) throws Exception;
+
+    /**
+     * 转换线索
+     * @param clueId clueId必须
+     * @param tran 为空说明不需要创建新交易
+     * @param creator 创建者
+     * @return flag
+     */
+    boolean convert(String clueId, Tran tran, User creator);
+
+
 }
