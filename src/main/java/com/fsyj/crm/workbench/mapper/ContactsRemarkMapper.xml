@@ -7,10 +7,10 @@
         insert into tbl_contacts_remark (id, noteContent, createBy, createTime, editBy, editTime, editFlag, contactsId)
         VALUES (#{id},
                 #{noteContent},
-                #{createTime},
                 #{createBy},
-                #{editTime},
+                #{createTime},
                 #{editBy},
+                #{editTime},
                 #{editFlag},
                 #{contactsId})
     </insert>

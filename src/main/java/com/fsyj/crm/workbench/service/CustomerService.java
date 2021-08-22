@@ -1,5 +1,7 @@
 package com.fsyj.crm.workbench.service;
 
+import com.fsyj.crm.workbench.bean.Customer;
+
 import java.util.List;
 
 /**
@@ -12,5 +14,5 @@ public interface CustomerService {
      * @param name
      * @return
      */
-    List<String> fuzzySearch(String name);
+    List<Customer> fuzzySearch(String name);
 }

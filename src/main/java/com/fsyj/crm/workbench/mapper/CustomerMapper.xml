@@ -24,6 +24,7 @@
                             on u2.id = tc.createBy
                  left join tbl_user u3
                            on u3.id = tc.editBy
+        where tc.name = #{company}
     </select>
 
     <insert id="createCustom" parameterType="com.fsyj.crm.workbench.bean.Customer">

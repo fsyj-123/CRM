@@ -5,16 +5,13 @@
 <mapper namespace="com.fsyj.crm.workbench.mapper.CustomerRemarkMapper">
     <insert id="add" parameterType="com.fsyj.crm.workbench.bean.CustomerRemark">
         insert into tbl_customer_remark (id, noteContent, createBy, createTime, editBy, editTime, editFlag, customerId)
-        VALUES
-(
-#{id},
-#{noteContent},
-#{createTime},
-#{createBy},
-#{editTime},
-#{editBy},
-#{editFlag},
-#{customerId}
-)
+        VALUES (#{id},
+                #{noteContent},
+                #{createBy},
+                #{createTime},
+                #{editBy},
+                #{editTime},
+                #{editFlag},
+                #{customerId})
     </insert>
 </mapper>

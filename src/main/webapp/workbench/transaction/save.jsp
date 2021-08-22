@@ -63,6 +63,11 @@
                 let val = $(this).val();
                 $("#create-possibility").val(s2p[val])
             })
+
+            // 保存
+            $("#submit").click(function () {
+                $("#save-form").submit();
+            })
         })
     </script>
 </head>
@@ -173,37 +178,38 @@
 <div style="position:  relative; left: 30px;">
     <h3>创建交易</h3>
     <div style="position: relative; top: -40px; left: 70%;">
-        <button type="button" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-primary" id="submit">保存</button>
         <button type="button" class="btn btn-default">取消</button>
     </div>
     <hr style="position: relative; top: -40px;">
 </div>
-<form class="form-horizontal" role="form" style="position: relative; top: -30px;">
+<form class="form-horizontal" id="save-form" action="workbench/tran.do" method="post" role="form" style="position: relative; top: -30px;">
+    <input type="hidden" name="action" value="saveTran">
     <div class="form-group">
         <label for="create-transactionOwner" class="col-sm-2 control-label">所有者<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <select class="form-control" id="create-transactionOwner">
+            <select class="form-control" name="owner" id="create-transactionOwner">
                 <c:forEach items="${requestScope.userList}" var="user">
-                    <option id="${user.id}" ${sessionScope.user.id eq user.id ? "selected" : ""}>${user.name}</option>
+                    <option value="${user.id}" ${sessionScope.user.id eq user.id ? "selected" : ""}>${user.name}</option>
                 </c:forEach>
             </select>
         </div>
         <label for="create-amountOfMoney" class="col-sm-2 control-label">金额</label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-amountOfMoney">
+            <input type="text" name="money" class="form-control" id="create-amountOfMoney">
         </div>
     </div>
 
     <div class="form-group">
         <label for="create-transactionName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-transactionName">
+            <input type="text" name="name" class="form-control" id="create-transactionName">
         </div>
         <label for="create-expectedClosingDate" class="col-sm-2 control-label">预计成交日期<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control timeDown" id="create-expectedClosingDate">
+            <input type="text" name="expectedDate" class="form-control timeDown" id="create-expectedClosingDate">
         </div>
     </div>
 
@@ -211,12 +217,12 @@
         <label for="create-customerName" class="col-sm-2 control-label">客户名称<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
+            <input type="text" name="customerName" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
         </div>
         <label for="create-transactionStage" class="col-sm-2 control-label">阶段<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <select class="form-control" id="create-transactionStage">
+            <select class="form-control" name="stage" id="create-transactionStage">
                 <option></option>
                 <c:forEach items="${applicationScope.stage}" var="stage">
                     <option value="${stage.value}">${stage.text}</option>
@@ -228,10 +234,11 @@
     <div class="form-group">
         <label for="create-transactionType" class="col-sm-2 control-label">类型</label>
         <div class="col-sm-10" style="width: 300px;">
-            <select class="form-control" id="create-transactionType">
+            <select class="form-control" name="type" id="create-transactionType">
                 <option></option>
-                <option>已有业务</option>
-                <option>新业务</option>
+                <c:forEach items="${applicationScope.transactionType}" var="item">
+                    <option value="${item.value}">${item.text}</option>
+                </c:forEach>
             </select>
         </div>
         <label for="create-possibility" class="col-sm-2 control-label">可能性</label>
@@ -243,22 +250,11 @@
     <div class="form-group">
         <label for="create-clueSource" class="col-sm-2 control-label">来源</label>
         <div class="col-sm-10" style="width: 300px;">
-            <select class="form-control" id="create-clueSource">
+            <select class="form-control" name="source" id="create-clueSource">
                 <option></option>
-                <option>广告</option>
-                <option>推销电话</option>
-                <option>员工介绍</option>
-                <option>外部介绍</option>
-                <option>在线商场</option>
-                <option>合作伙伴</option>
-                <option>公开媒介</option>
-                <option>销售邮件</option>
-                <option>合作伙伴研讨会</option>
-                <option>内部研讨会</option>
-                <option>交易会</option>
-                <option>web下载</option>
-                <option>web调研</option>
-                <option>聊天</option>
+                <c:forEach items="${applicationScope.source}" var="item">
+                    <option value="${item.value}">${item.text}</option>
+                </c:forEach>
             </select>
         </div>
         <label for="create-activitySrc" class="col-sm-2 control-label">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);"
@@ -266,7 +262,8 @@
                                                                                            data-target="#findMarketActivity"><span
                 class="glyphicon glyphicon-search"></span></a></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-activitySrc">
+            <input type="text" class="form-control" id="create-activitySrc" value="测试（属于阿里）">
+            <input type="hidden" class="form-control" name="activityId" value="b086787e6c72456d8a3d67504fc36831">
         </div>
     </div>
 
@@ -276,28 +273,29 @@
                                                                                             data-target="#findContacts"><span
                 class="glyphicon glyphicon-search"></span></a></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-contactsName">
+            <input type="text" class="form-control" id="create-contactsName" value="马云">
+            <input type="hidden" name="contactsId" value="fe707cbfa0fb44b5ae9a13c2bed66cf4">
         </div>
     </div>
 
     <div class="form-group">
         <label for="create-describe" class="col-sm-2 control-label">描述</label>
         <div class="col-sm-10" style="width: 70%;">
-            <textarea class="form-control" rows="3" id="create-describe"></textarea>
+            <textarea class="form-control" name="description" rows="3" id="create-describe"></textarea>
         </div>
     </div>
 
     <div class="form-group">
         <label for="create-contactSummary" class="col-sm-2 control-label">联系纪要</label>
         <div class="col-sm-10" style="width: 70%;">
-            <textarea class="form-control" rows="3" id="create-contactSummary"></textarea>
+            <textarea class="form-control" name="contactSummary" rows="3" id="create-contactSummary"></textarea>
         </div>
     </div>
 
     <div class="form-group">
         <label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control timeUp" id="create-nextContactTime">
+            <input type="text" class="form-control timeUp" name="nextContactTime" id="create-nextContactTime">
         </div>
     </div>
 
