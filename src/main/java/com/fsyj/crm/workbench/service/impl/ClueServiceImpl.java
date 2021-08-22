@@ -101,7 +101,7 @@ public class ClueServiceImpl implements ClueService {
         TranMapper tranMapper = SqlSessionUtil.getSqlSession().getMapper(TranMapper.class);
         TranHistoryMapper tranHistoryMapper = SqlSessionUtil.getSqlSession().getMapper(TranHistoryMapper.class);
 
-        Clue clue = clueMapper.queryForOne(clueId);
+        Clue clue = clueMapper.plainQueryById(clueId);
 
         String company = clue.getCompany();
         Customer customer = customerMapper.queryByName(company);

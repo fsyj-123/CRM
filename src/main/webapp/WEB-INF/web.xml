@@ -56,4 +56,13 @@
         <servlet-name>ClueServlet</servlet-name>
         <url-pattern>/workbench/clue.do</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>TranServlet</servlet-name>
+        <servlet-class>com.fsyj.crm.workbench.web.controller.TranServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TranServlet</servlet-name>
+        <url-pattern>/workbench/tran.do</url-pattern>
+    </servlet-mapping>
 </web-app>

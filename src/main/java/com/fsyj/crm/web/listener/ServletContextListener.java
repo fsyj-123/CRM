@@ -1,5 +1,7 @@
 package com.fsyj.crm.web.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fsyj.crm.settings.bean.DicValue;
 import com.fsyj.crm.settings.service.DicService;
 import com.fsyj.crm.settings.service.impl.DicServiceImpl;
@@ -7,9 +9,7 @@ import com.fsyj.crm.utils.ServiceFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author fsyj
@@ -22,7 +22,28 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
         Set<Map.Entry<String, List<DicValue>>> entries = dicMap.entrySet();
         ServletContext servletContext = sce.getServletContext();
         for (Map.Entry<String, List<DicValue>> entry : entries) {
-            servletContext.setAttribute(entry.getKey(),entry.getValue());
+            servletContext.setAttribute(entry.getKey(), entry.getValue());
         }
+
+        /*
+         处理阶段与可能性的对应关系
+         Properties类用于处理不含中文或Unicode编码的键值对
+         */
+        Map<String, String> map = new HashMap<>(9);
+        ResourceBundle stage2Possibility = ResourceBundle.getBundle("Stage2Possibility");
+        Enumeration<String> keys = stage2Possibility.getKeys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            String value = stage2Possibility.getString(key);
+            map.put(key, value);
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        String mapJson = "";
+        try {
+            mapJson = mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        servletContext.setAttribute("s2p", mapJson);
     }
 }

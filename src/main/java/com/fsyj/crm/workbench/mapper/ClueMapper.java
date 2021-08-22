@@ -10,6 +10,12 @@ import java.util.List;
  * @author fsyj
  */
 public interface ClueMapper {
+    /**
+     * 普通原生单查询
+     * @param id
+     * @return
+     */
+    Clue plainQueryById(@Param("id") String id);
 
     /**
      * 保存线索

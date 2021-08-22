@@ -132,4 +132,8 @@
     <delete id="deleteById">
         delete from tbl_clue where id = #{id}
     </delete>
+
+    <select id="plainQueryById" resultType="com.fsyj.crm.workbench.bean.Clue">
+        select * from tbl_clue where id = #{id};
+    </select>
 </mapper>

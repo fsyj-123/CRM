@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -8,12 +9,62 @@
     <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css"
           rel="stylesheet"/>
 
+
     <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
     <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="jquery/bootstrap-typeahead/bootstrap3-typeahead.min.js"></script>
     <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript"
             src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
+    <script type="text/javascript">
+        // 初始化s2p
+        let s2p = ${applicationScope.s2p};
+
+        $(function () {
+            // 两套日历插件
+            $(".timeDown").datetimepicker({
+                minView: "month",
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayBtn: true,
+                pickerPosition: "bottom-left"
+            });
+            $(".timeUp").datetimepicker({
+                minView: "month",
+                language: 'zh-CN',
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayBtn: true,
+                pickerPosition: "top-left"
+            });
+
+            // 搜索框自动补全插件
+            $("#create-customerName").typeahead({
+                source: function (query, process) {
+                    $.post(
+                        "workbench/tran.do",
+                        {
+                            "name": query,
+                            "action": "queryCustomByName"
+                        },
+                        function (data) {
+                            process(data);
+                        },
+                        "json"
+                    );
+                },
+                delay: 1500
+            });
+
+            // 阶段改变时自动填写交易可能性
+            $("#create-transactionStage").change(function () {
+                let val = $(this).val();
+                $("#create-possibility").val(s2p[val])
+            })
+        })
+    </script>
 </head>
 <body>
 
@@ -133,9 +184,9 @@
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
             <select class="form-control" id="create-transactionOwner">
-                <option>zhangsan</option>
-                <option>lisi</option>
-                <option>wangwu</option>
+                <c:forEach items="${requestScope.userList}" var="user">
+                    <option id="${user.id}" ${sessionScope.user.id eq user.id ? "selected" : ""}>${user.name}</option>
+                </c:forEach>
             </select>
         </div>
         <label for="create-amountOfMoney" class="col-sm-2 control-label">金额</label>
@@ -152,30 +203,24 @@
         <label for="create-expectedClosingDate" class="col-sm-2 control-label">预计成交日期<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-expectedClosingDate">
+            <input type="text" class="form-control timeDown" id="create-expectedClosingDate">
         </div>
     </div>
 
     <div class="form-group">
-        <label for="create-accountName" class="col-sm-2 control-label">客户名称<span
+        <label for="create-customerName" class="col-sm-2 control-label">客户名称<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-accountName" placeholder="支持自动补全，输入客户不存在则新建">
+            <input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
         </div>
         <label for="create-transactionStage" class="col-sm-2 control-label">阶段<span
                 style="font-size: 15px; color: red;">*</span></label>
         <div class="col-sm-10" style="width: 300px;">
             <select class="form-control" id="create-transactionStage">
                 <option></option>
-                <option>资质审查</option>
-                <option>需求分析</option>
-                <option>价值建议</option>
-                <option>确定决策者</option>
-                <option>提案/报价</option>
-                <option>谈判/复审</option>
-                <option>成交</option>
-                <option>丢失的线索</option>
-                <option>因竞争丢失关闭</option>
+                <c:forEach items="${applicationScope.stage}" var="stage">
+                    <option value="${stage.value}">${stage.text}</option>
+                </c:forEach>
             </select>
         </div>
     </div>
@@ -252,7 +297,7 @@
     <div class="form-group">
         <label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
         <div class="col-sm-10" style="width: 300px;">
-            <input type="text" class="form-control" id="create-nextContactTime">
+            <input type="text" class="form-control timeUp" id="create-nextContactTime">
         </div>
     </div>
 

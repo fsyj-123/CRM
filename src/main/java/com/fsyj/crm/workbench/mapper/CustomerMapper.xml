@@ -43,4 +43,25 @@
                 #{description},
                 #{address})
     </insert>
+
+    <select id="fuzzyQuery" resultType="com.fsyj.crm.workbench.bean.Customer">
+        select tc.id,
+               tu2.name as owner,
+               tc.name,
+               tc.website,
+               tc.phone,
+               tu1.name as createBy,
+               tc.createTime,
+               tu3.name as editBy,
+               tc.editTime,
+               tc.contactSummary,
+               tc.nextContactTime,
+               tc.description,
+               tc.address
+        from tbl_customer tc
+                 inner join tbl_user tu1 on tc.createBy = tu1.id
+                 inner join tbl_user tu2 on tc.owner = tu2.id
+                 left join tbl_user tu3 on tc.editBy = tu3.id
+        where tc.name like '%' #{name} '%'
+    </select>
 </mapper>

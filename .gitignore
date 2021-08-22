@@ -5,6 +5,7 @@
 #idea enveriment
 .idea/
 4_CRM项目/
+src/test/
 
 # Log file
 *.log
