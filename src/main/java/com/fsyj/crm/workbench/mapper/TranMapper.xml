@@ -7,25 +7,52 @@
         insert into tbl_tran (id, owner, money, name, expectedDate, customerId, stage, type, source, activityId,
                               contactsId, createBy, createTime, editBy, editTime, description, contactSummary,
                               nextContactTime)
-        VALUES(
-        #{id},
-        #{owner},
-        #{money},
-        #{name},
-        #{expectedDate},
-        #{customerId},
-        #{stage},
-        #{type},
-        #{source},
-        #{activityId},
-        #{contactsId},
-        #{createBy},
-        #{createTime},
-        #{editBy},
-        #{editTime},
-        #{description},
-        #{contactSummary},
-        #{nextContactTime}
-              )
+        VALUES (#{id},
+                #{owner},
+                #{money},
+                #{name},
+                #{expectedDate},
+                #{customerId},
+                #{stage},
+                #{type},
+                #{source},
+                #{activityId},
+                #{contactsId},
+                #{createBy},
+                #{createTime},
+                #{editBy},
+                #{editTime},
+                #{description},
+                #{contactSummary},
+                #{nextContactTime})
     </insert>
+
+    <select id="queryById" resultType="com.fsyj.crm.workbench.bean.Tran">
+        select tt.id,
+               tu.name as owner,
+               tt.money,
+               tt.name,
+               tt.expectedDate,
+               tcu.name as customerId,
+               tt.stage,
+               tt.type,
+               tt.source,
+               ta.name as activityId,
+               tc.fullname as contactsId,
+               tu2.name as createBy,
+               tt.createTime,
+               tu3.name as editBy,
+               tt.editTime,
+               tt.description,
+               tt.contactSummary,
+               tt.nextContactTime
+        from tbl_tran tt
+                 inner join tbl_user tu on tt.owner = tu.id
+                 inner join tbl_contacts tc on tt.contactsId = tc.id
+                 left join tbl_activity ta on ta.id = tt.activityId
+                 left join tbl_customer tcu on tt.customerId = tcu.id
+                 inner join tbl_user tu2 on tt.createBy = tu2.id
+                 left join tbl_user tu3 on tt.editBy = tu3.id
+        where tt.id = #{id}
+    </select>
 </mapper>

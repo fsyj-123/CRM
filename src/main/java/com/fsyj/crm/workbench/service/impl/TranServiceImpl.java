@@ -10,6 +10,8 @@ import com.fsyj.crm.workbench.mapper.TranHistoryMapper;
 import com.fsyj.crm.workbench.mapper.TranMapper;
 import com.fsyj.crm.workbench.service.TranService;
 
+import java.util.List;
+
 /**
  * @author fsyj
  */
@@ -34,5 +36,17 @@ public class TranServiceImpl implements TranService {
         BeanUtil.convert(history, tran);
         history.setTranId(tran.getId());
         tranHistoryMapper.save(history);
+    }
+
+    @Override
+    public Tran query(String id) {
+        TranMapper tranMapper = SqlSessionUtil.getSqlSession().getMapper(TranMapper.class);
+        return tranMapper.queryById(id);
+    }
+
+    @Override
+    public List<TranHistory> getHistoryList(String tranId) {
+        TranHistoryMapper historyMapper = SqlSessionUtil.getSqlSession().getMapper(TranHistoryMapper.class);
+        return historyMapper.queryByTranId(tranId);
     }
 }

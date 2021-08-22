@@ -15,4 +15,18 @@
                 #{tranId}
                )
     </insert>
+
+    <select id="queryByTranId" resultType="com.fsyj.crm.workbench.bean.TranHistory">
+        select
+            tth.id,
+            tth.stage,
+            tth.money,
+            tth.expectedDate,
+            tth.createTime,
+            tu.name as createBy,
+            tth.tranId
+from tbl_tran_history tth
+inner join tbl_user tu on tth.createBy = tu.id
+where tth.tranId = #{tranId}
+    </select>
 </mapper>

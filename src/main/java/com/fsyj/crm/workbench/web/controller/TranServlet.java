@@ -8,17 +8,16 @@ import com.fsyj.crm.utils.constStrings.Path;
 import com.fsyj.crm.web.controller.BaseServlet;
 import com.fsyj.crm.workbench.bean.Customer;
 import com.fsyj.crm.workbench.bean.Tran;
+import com.fsyj.crm.workbench.bean.TranHistory;
 import com.fsyj.crm.workbench.service.CustomerService;
 import com.fsyj.crm.workbench.service.TranService;
 import com.fsyj.crm.workbench.service.impl.CustomerServiceImpl;
 import com.fsyj.crm.workbench.service.impl.TranServiceImpl;
-import sun.plugin.util.UIUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,6 +42,7 @@ public class TranServlet extends BaseServlet {
         }
         PrintJson.printJsonObj(response, nameList);
     }
+
     public void saveTran(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         TranService service = (TranService) ServiceFactory.getService(new TranServiceImpl());
         Tran tran = BeanUtil.getObjectFromMap(request.getParameterMap(), Tran.class);
@@ -53,5 +53,22 @@ public class TranServlet extends BaseServlet {
         tran.setCreateTime(DateTimeUtil.getSysTime());
         service.save(tran, request.getParameter("customerName"));
         response.sendRedirect(Path.PROJECT_PATH + "workbench/transaction/index.jsp");
+    }
+
+    public void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
+        String id = request.getParameter("id");
+        System.out.println("id:----------" + id);
+        Tran tran = tranService.query(id);
+        System.out.println("---------------------");
+        System.out.println(tran);
+        request.setAttribute("tran", tran);
+        request.getRequestDispatcher("/workbench/transaction/detail.jsp").forward(request, response);
+    }
+
+    public void getHistoryList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
+        List<TranHistory> histories = tranService.getHistoryList(request.getParameter("tranId"));
+        PrintJson.printJsonObj(response, histories);
     }
 }
