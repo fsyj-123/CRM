@@ -55,4 +55,8 @@
                  left join tbl_user tu3 on tt.editBy = tu3.id
         where tt.id = #{id}
     </select>
+
+    <update id="updateStage">
+        update tbl_tran set stage = #{stage}, editBy = #{editBy}, editTime = #{editTime}  where id = #{id}
+    </update>
 </mapper>

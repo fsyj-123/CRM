@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -31,9 +32,96 @@
         // 初始化s2p
         let s2p = ${applicationScope.s2p};
 
+        // 根据可能性处理交易失败的断点 --- 由于json中的键值对是无序的，所以将断点获取放在后端(listener )处理
+        let stagePoint = parseInt(${applicationScope.stagePoint});
+
+        let currentStageIndex = parseInt(${requestScope.currentStageIndex});
+
+
+        // 拼接阶段图标
+        function refreshStage() {
+            let stageSize = Object.keys(s2p).length;
+            let currentStage = "${requestScope.tran.stage}";
+            let children = $("#stage").children("span");
+            // 在有可能性阶段
+            if (currentStageIndex < stagePoint) {
+                console.log("处理成功阶段");
+                // 处理0到currentStageIndex
+                for (let i = 0; i < currentStageIndex; i++) {
+                    $(children[i]).prop("style", "color: #90F790;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-ok-circle mystage");
+                }
+                // 处理currentStageIndex
+                $(children[currentStageIndex]).prop("style", "color: #90F790;");
+                $(children[currentStageIndex]).prop("class", "glyphicon glyphicon-map-marker mystage");
+                // 处理currentStageIndex到stagePoint
+                for (let i = currentStageIndex + 1; i < stagePoint; i++) {
+                    $(children[i]).prop("style", "color: #000000;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-record mystage");
+                }
+                // 处理stagePoint到stageSize
+                for (let i = stagePoint; i < stageSize; i++) {
+                    $(children[i]).prop("style", "color: #000000;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-remove mystage");
+                }
+            } else {
+                console.log("处理失败阶段");
+                // 处理从0到stagePoint（黑圈）
+                for (let i = 0; i < stagePoint; i++) {
+                    $(children[i]).prop("style", "color: #000000;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-record mystage");
+                }
+                // 处理从stagePoint到currentStageIndex（黑叉）
+                for (let i = stagePoint; i < currentStageIndex; i++) {
+                    $(children[i]).prop("style", "color: #000000;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-remove mystage");
+                }
+                // 处理currentStageIndex（红叉）
+                $(children[currentStageIndex]).prop("style", "color: #FF0000;");
+                $(children[currentStageIndex]).prop("class", "glyphicon glyphicon-remove mystage");
+                // 处理currentStageIndex + 1到stageSize
+                for (let i = currentStageIndex + 1; i < stageSize; i++) {
+                    $(children[i]).prop("style", "color: #000000;");
+                    $(children[i]).prop("class", "glyphicon glyphicon-remove mystage");
+                }
+            }
+
+            // 定位到当前点
+            // 改进：在前端页面加载是处理currentStageIndex
+            /*if (children[i].dataset.content === currentStage) {
+                // 情况一：当前点位于有可能性阶段
+                if (i < stagePoint) {
+                    // 先处理当前点
+                    $(children[i]).prop("style", "color: #90F790");
+                    $(children[i]).prop("class", "glyphicon glyphicon-map-marker mystage");
+
+                    // 处理当前点之前的点
+                    for (let j = 0; j < i; j++) {
+                        $(children[i]).prop("style", "color: #90F790;");
+                        $(children[j]).prop("class", "glyphicon glyphicon-ok-circle mystage");
+                    }
+                    // 处理i+1到stagePoint的点
+                    for (let j = i + 1; j < stagePoint; j++) {
+                        $(children[i]).prop("style", "color: #000000;");
+                        $(children[j]).prop("class", "glyphicon glyphicon-record mystage");
+                    }
+                    // 处理stagePoint到stageSize的点
+                    for (let j = stagePoint; j < stageSize; j++) {
+                        $(children[i]).prop("style", "color: #000000;");
+                        $(children[j]).prop("class", "glyphicon glyphicon-remove mystage");
+                    }
+                }
+            }*/
+        }
+
         // 刷新可能性方法
-        function refreshPossibility() {
-            $("#possibility").text(s2p["${requestScope.tran.stage}"])
+        function refreshPossibility(stage) {
+            console.log(stage)
+            if (stage === null) {
+                $("#possibility").text(s2p["${requestScope.tran.stage}"])
+            } else {
+                $("#possibility").text(s2p[stage])
+            }
         }
 
         // 局部刷新交易历史
@@ -47,7 +135,6 @@
                 dataType: "json",
                 type: "post",
                 success: function (data) {
-                    console.log(data)
                     let html = "";
                     $.each(data, function (index, item) {
                         html += "<tr>";
@@ -63,6 +150,51 @@
                 }
             })
         }
+
+        // 总的局部刷新方法
+        function refresh(data) {
+            console.log(data)
+            // 刷新交易的详细信息
+            if (data !== null) {
+                $("#tranStage").html(data.stage);
+                $("#tranEditBy").html(data.editBy);
+                $("#tranEditTime").html(data.editTime);
+            }
+            refreshStage();
+            refreshHistory();
+            refreshPossibility(data == null ? null : data.stage);
+        }
+
+        /*
+         阶段变更方法
+         stage: 需要变更的阶段
+         index：需要变更到的阶段index
+         */
+        function stageChange(stage, index) {
+            index = index - 1;
+            if (index === currentStageIndex) {
+                // 如果需要变更的是当前阶段，则直接返回
+                return;
+            }
+            $.ajax({
+                url: "workbench/tran.do",
+                data: {
+                    action: "stageChange",
+                    tranId: "${requestScope.tran.id}",
+                    index:index,
+                    currentStageIndex:currentStageIndex,
+                    stage: stage
+                },
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    currentStageIndex = index;
+                    // 刷新
+                    refresh(data);
+                }
+            })
+        }
+
 
         $(function () {
             $("#remark").focus(function () {
@@ -99,7 +231,6 @@
                 $(this).children("span").css("color", "#E6E6E6");
             });
 
-
             //阶段提示框
             $(".mystage").popover({
                 trigger: 'manual',
@@ -121,10 +252,7 @@
                 }, 100);
             });
 
-            // 根据阶段信息动态刷新可能性
-            refreshPossibility();
-            // 刷新交易阶段
-            refreshHistory();
+            refresh(null);
         });
 
 
@@ -153,35 +281,44 @@
 </div>
 
 <!-- 阶段状态 -->
-<div style="position: relative; left: 40px; top: -50px;">
+<div style="position: relative; left: 40px; top: -50px;" id="stage">
     阶段&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
-          data-content="资质审查" style="color: #90F790;"></span>
-    -----------
-    <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
-          data-content="需求分析" style="color: #90F790;"></span>
-    -----------
-    <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
-          data-content="价值建议" style="color: #90F790;"></span>
-    -----------
-    <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
-          data-content="确定决策者" style="color: #90F790;"></span>
-    -----------
-    <span class="glyphicon glyphicon-map-marker mystage" data-toggle="popover" data-placement="bottom"
-          data-content="提案/报价" style="color: #90F790;"></span>
-    -----------
-    <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
-          data-content="谈判/复审"></span>
-    -----------
-    <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
-          data-content="成交"></span>
-    -----------
-    <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
-          data-content="丢失的线索"></span>
-    -----------
-    <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
-          data-content="因竞争丢失关闭"></span>
-    -----------
+    <c:forEach items="${applicationScope.stage}" var="item">
+        <span data-toggle="popover" onclick="stageChange('${item.value}','${item.orderNo}')" data-placement="bottom"
+              data-content="${item.text}"></span>
+        -----------
+    </c:forEach>
+    <script>
+        // 一个小BUG：这里需要再次去调用function才能使鼠标悬停事件触发，如果注释掉将无法触发鼠标悬停事件，图标能展示
+        refreshStage();
+    </script>
+    <%--<span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
+           data-content="资质审查" style="color: #90F790;"></span>
+     -----------
+     <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
+           data-content="需求分析" style="color: #90F790;"></span>
+     -----------
+     <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
+           data-content="价值建议" style="color: #90F790;"></span>
+     -----------
+     <span class="glyphicon glyphicon-ok-circle mystage" data-toggle="popover" data-placement="bottom"
+           data-content="确定决策者" style="color: #90F790;"></span>
+     -----------
+     <span class="glyphicon glyphicon-map-marker mystage" data-toggle="popover" data-placement="bottom"
+           data-content="提案/报价" style="color: #90F790;"></span>
+     -----------
+     <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
+           data-content="谈判/复审"></span>
+     -----------
+     <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
+           data-content="成交"></span>
+     -----------
+     <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
+           data-content="丢失的线索"></span>
+     -----------
+     <span class="glyphicon glyphicon-record mystage" data-toggle="popover" data-placement="bottom"
+           data-content="因竞争丢失关闭"></span>
+     -------------%>
     <span class="closingDate">2010-10-10</span>
 </div>
 
@@ -210,7 +347,7 @@
         <div style="width: 300px;position: relative; left: 200px; top: -20px;"><b>${requestScope.tran.customerId}</b>
         </div>
         <div style="width: 300px;position: relative; left: 450px; top: -40px; color: gray;">阶段</div>
-        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b>${requestScope.tran.stage}</b></div>
+        <div style="width: 300px;position: relative; left: 650px; top: -60px;"><b id="tranStage">${requestScope.tran.stage}</b></div>
         <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px;"></div>
         <div style="height: 1px; width: 400px; background: #D5D5D5; position: relative; top: -60px; left: 450px;"></div>
     </div>
@@ -245,8 +382,8 @@
     </div>
     <div style="position: relative; left: 40px; height: 30px; top: 70px;">
         <div style="width: 300px; color: gray;">修改者</div>
-        <div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${requestScope.tran.editBy}&nbsp;&nbsp;</b><small
-                style="font-size: 10px; color: gray;">${requestScope.tran.editTime}</small></div>
+        <div style="width: 500px;position: relative; left: 200px; top: -20px;"><b id="tranEditBy">${requestScope.tran.editBy}&nbsp;&nbsp;</b><small
+                style="font-size: 10px; color: gray;" id="tranEditTime">${requestScope.tran.editTime}</small></div>
         <div style="height: 1px; width: 550px; background: #D5D5D5; position: relative; top: -20px;"></div>
     </div>
     <div style="position: relative; left: 40px; height: 30px; top: 80px;">

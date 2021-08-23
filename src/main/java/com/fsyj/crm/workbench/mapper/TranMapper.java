@@ -17,4 +17,11 @@ public interface TranMapper {
      * @return
      */
     Tran queryById(@Param("id") String id);
+
+    /**
+     * 通过ID更新阶段
+     * @param tran
+     * @param stage
+     */
+    void updateStage(Tran tran);
 }

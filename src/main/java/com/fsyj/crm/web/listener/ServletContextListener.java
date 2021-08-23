@@ -37,6 +37,7 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
             String value = stage2Possibility.getString(key);
             map.put(key, value);
         }
+        // 将阶段Map转换为json
         ObjectMapper mapper = new ObjectMapper();
         String mapJson = "";
         try {
@@ -45,5 +46,19 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
             e.printStackTrace();
         }
         servletContext.setAttribute("s2p", mapJson);
+
+
+        // 获取阶段信息
+        List<DicValue> stages = dicMap.get("stage");
+        int size = stages.size();
+        for (int i = 0; i < size; i++) {
+            String possibility = map.get(stages.get(i).getText());
+            if ("0".equals(possibility)) {
+                servletContext.setAttribute("stagePoint", i);
+                break;
+            }
+        }
     }
+
+
 }

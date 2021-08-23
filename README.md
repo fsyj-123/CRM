@@ -11,11 +11,16 @@
 本项目基于动力节点的CRM项目的基础上做了以下改动
 
 1. 对servlet的访问抽取出BaseServlet，避免重复设置url
+
 2. 编写BeanUtil，用于解决一些重复的get、set方法
+
 3. jquery封装表单数据为json
    1. 给你的form表单取个id值    id="zq_form"
-   2. 然后js封装  【温馨下提示：这里可将此类多处会使用到的代码抽取出来单独存放去引入】
-      `//序列化表单字段为json对象
+   
+   2. 然后js封装  【温馨下提示：这里可将此类多处会使用到的代码抽取出来单独存放去引入】  
+   
+      ```javascript
+      //序列化表单字段为json对象
       $.fn.serializeFormToJson = function(){
             let arr = $(this).serializeArray();//form表单数据 name：value
             let param = {};
@@ -23,10 +28,18 @@
                 param[obj.name] = obj.value;
             })
             return param;
-        }`
+        }
+      ```
+   
    3. 使用
       `var formData = $("#zq_form").serializeFormToJson();
-      console.debug(formData);`
+      console.debug(formData);` 
+   
+4. 对于交易阶段中的可能性，为了不破坏bean结构以及为了前端jsp页面的可维护性，将可能性的处理放在前端利用json处理
 
-
-
+   ```javascript
+   // 初始化s2p
+   let s2p = ${applicationScope.s2p};
+   
+   "<td>" + s2p[item.stage] + "</td>";
+   ```

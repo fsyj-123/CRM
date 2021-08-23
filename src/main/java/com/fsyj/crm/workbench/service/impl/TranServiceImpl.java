@@ -1,6 +1,7 @@
 package com.fsyj.crm.workbench.service.impl;
 
 import com.fsyj.crm.utils.BeanUtil;
+import com.fsyj.crm.utils.DateTimeUtil;
 import com.fsyj.crm.utils.SqlSessionUtil;
 import com.fsyj.crm.workbench.bean.Customer;
 import com.fsyj.crm.workbench.bean.Tran;
@@ -48,5 +49,27 @@ public class TranServiceImpl implements TranService {
     public List<TranHistory> getHistoryList(String tranId) {
         TranHistoryMapper historyMapper = SqlSessionUtil.getSqlSession().getMapper(TranHistoryMapper.class);
         return historyMapper.queryByTranId(tranId);
+    }
+
+    @Override
+    public Tran changeStage(Tran tran, String stage, String creator) {
+        TranMapper tranMapper = SqlSessionUtil.getSqlSession().getMapper(TranMapper.class);
+        TranHistoryMapper historyMapper = SqlSessionUtil.getSqlSession().getMapper(TranHistoryMapper.class);
+
+        String tranId = tran.getId();
+        // update交易
+        tran.setEditBy(creator);
+        tran.setEditTime(DateTimeUtil.getSysTime());
+        tran.setStage(stage);
+        tranMapper.updateStage(tran);
+        // 新增交易历史
+        TranHistory history = BeanUtil.createObject(TranHistory.class, creator);
+        history.setStage(stage);
+        history.setTranId(tranId);
+        history.setExpectedDate(tran.getExpectedDate());
+        history.setMoney(tran.getMoney());
+        historyMapper.save(history);
+
+        return tranMapper.queryById(tranId);
     }
 }

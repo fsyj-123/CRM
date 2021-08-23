@@ -1,5 +1,6 @@
 package com.fsyj.crm.workbench.web.controller;
 
+import com.fsyj.crm.settings.bean.DicValue;
 import com.fsyj.crm.settings.bean.User;
 import com.fsyj.crm.settings.service.UserService;
 import com.fsyj.crm.settings.service.impl.UserServiceImpl;
@@ -58,17 +59,43 @@ public class TranServlet extends BaseServlet {
     public void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
         String id = request.getParameter("id");
-        System.out.println("id:----------" + id);
         Tran tran = tranService.query(id);
-        System.out.println("---------------------");
-        System.out.println(tran);
+        // 确定当前阶段下标
+        currentIndex(request, tran);
+
         request.setAttribute("tran", tran);
         request.getRequestDispatcher("/workbench/transaction/detail.jsp").forward(request, response);
+    }
+
+    private void currentIndex(HttpServletRequest request, Tran tran) {
+        // 确定当前阶段下标
+        List<DicValue> stages = (List<DicValue>) request.getServletContext().getAttribute("stage");
+        int size = stages.size();
+        for (int i = 0; i < size; i++) {
+            if (tran.getStage().equals(stages.get(i).getValue())) {
+                request.setAttribute("currentStageIndex", i);
+                break;
+            }
+        }
     }
 
     public void getHistoryList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
         List<TranHistory> histories = tranService.getHistoryList(request.getParameter("tranId"));
         PrintJson.printJsonObj(response, histories);
+    }
+
+    public void stageChange(HttpServletRequest request, HttpServletResponse response) {
+        TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
+        String tranId = request.getParameter("tranId");
+        String stage = request.getParameter("stage");
+        Tran tran = tranService.query(tranId);
+        if (tran == null || stage == null || "".equals(stage) || tran.getStage().equals(stage)) {
+            // 更改参数不合规或阶段并未改变
+            return;
+        }
+        User user = (User) request.getSession().getAttribute("user");
+        tran = tranService.changeStage(tran, stage, user.getId());
+        PrintJson.printJsonObj(response, tran);
     }
 }

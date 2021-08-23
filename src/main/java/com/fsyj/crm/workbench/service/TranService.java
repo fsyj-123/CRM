@@ -29,4 +29,13 @@ public interface TranService {
      * @return
      */
     List<TranHistory> getHistoryList(String tranId);
+
+    /**
+     * 更改阶段
+     * @param tran
+     * @param stage 需要更改到的阶段
+     * @param creator 创建者ID
+     * @return
+     */
+    Tran changeStage(Tran tran, String stage, String creator);
 }

@@ -28,5 +28,6 @@
 from tbl_tran_history tth
 inner join tbl_user tu on tth.createBy = tu.id
 where tth.tranId = #{tranId}
+order by createTime
     </select>
 </mapper>
