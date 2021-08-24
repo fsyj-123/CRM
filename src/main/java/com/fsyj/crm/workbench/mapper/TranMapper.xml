@@ -59,4 +59,8 @@
     <update id="updateStage">
         update tbl_tran set stage = #{stage}, editBy = #{editBy}, editTime = #{editTime}  where id = #{id}
     </update>
+
+    <select id="getStageGroup" resultType="com.fsyj.crm.vo.EchartsDataPair">
+        select count(*) as value, stage as name from tbl_tran group by stage;
+    </select>
 </mapper>

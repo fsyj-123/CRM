@@ -6,6 +6,7 @@ import com.fsyj.crm.settings.service.UserService;
 import com.fsyj.crm.settings.service.impl.UserServiceImpl;
 import com.fsyj.crm.utils.*;
 import com.fsyj.crm.utils.constStrings.Path;
+import com.fsyj.crm.vo.EchartsDataPair;
 import com.fsyj.crm.web.controller.BaseServlet;
 import com.fsyj.crm.workbench.bean.Customer;
 import com.fsyj.crm.workbench.bean.Tran;
@@ -97,5 +98,10 @@ public class TranServlet extends BaseServlet {
         User user = (User) request.getSession().getAttribute("user");
         tran = tranService.changeStage(tran, stage, user.getId());
         PrintJson.printJsonObj(response, tran);
+    }
+    public void getGroupData(HttpServletRequest request, HttpServletResponse response) {
+        TranService tranService = (TranService) ServiceFactory.getService(new TranServiceImpl());
+        List<EchartsDataPair> groupData = tranService.getGroupData();
+        PrintJson.printJsonObj(response, groupData);
     }
 }

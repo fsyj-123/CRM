@@ -1,7 +1,10 @@
 package com.fsyj.crm.workbench.mapper;
 
+import com.fsyj.crm.vo.EchartsDataPair;
 import com.fsyj.crm.workbench.bean.Tran;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface TranMapper {
 
@@ -21,7 +24,12 @@ public interface TranMapper {
     /**
      * 通过ID更新阶段
      * @param tran
-     * @param stage
      */
     void updateStage(Tran tran);
+
+    /**
+     * 获取阶段数量分组数据
+     * @return
+     */
+    List<EchartsDataPair> getStageGroup();
 }

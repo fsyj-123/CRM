@@ -3,6 +3,7 @@ package com.fsyj.crm.workbench.service.impl;
 import com.fsyj.crm.utils.BeanUtil;
 import com.fsyj.crm.utils.DateTimeUtil;
 import com.fsyj.crm.utils.SqlSessionUtil;
+import com.fsyj.crm.vo.EchartsDataPair;
 import com.fsyj.crm.workbench.bean.Customer;
 import com.fsyj.crm.workbench.bean.Tran;
 import com.fsyj.crm.workbench.bean.TranHistory;
@@ -71,5 +72,11 @@ public class TranServiceImpl implements TranService {
         historyMapper.save(history);
 
         return tranMapper.queryById(tranId);
+    }
+
+    @Override
+    public List<EchartsDataPair> getGroupData() {
+        TranMapper tranMapper = SqlSessionUtil.getSqlSession().getMapper(TranMapper.class);
+        return tranMapper.getStageGroup();
     }
 }

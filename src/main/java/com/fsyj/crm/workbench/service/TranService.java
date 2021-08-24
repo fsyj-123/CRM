@@ -1,5 +1,6 @@
 package com.fsyj.crm.workbench.service;
 
+import com.fsyj.crm.vo.EchartsDataPair;
 import com.fsyj.crm.workbench.bean.Tran;
 import com.fsyj.crm.workbench.bean.TranHistory;
 
@@ -38,4 +39,10 @@ public interface TranService {
      * @return
      */
     Tran changeStage(Tran tran, String stage, String creator);
+
+    /**
+     * 获取echarts中的dataSet类型的数据
+     * @return
+     */
+    List<EchartsDataPair> getGroupData();
 }
